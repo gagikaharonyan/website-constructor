@@ -98,12 +98,12 @@ function Header(props) {
         <AppBar className={classes.header}>
             <Toolbar >
                 <Link to="/">
-                    <Typography variant = "headline" className={classes.logo} >Website constructor</Typography>
+                    <Typography variant = "inherit" className={classes.logo} >Website constructor</Typography>
                 </Link>
                 <div className={classes.menu}>
-                    <Typography variant = "subheading" className = {classes.padding} color="inherit" >OPTION 1</Typography>
-                    <Typography variant = "subheading" className = {classes.padding} color="inherit" >OPTION 2</Typography>
-                    <Typography variant = "subheading" className = {classes.padding} color="inherit" >OPTION 3</Typography>
+                    <Typography variant = "inherit" className = {classes.padding} color="inherit" >OPTION 1</Typography>
+                    <Typography variant = "inherit" className = {classes.padding} color="inherit" >OPTION 2</Typography>
+                    <Typography variant = "inherit" className = {classes.padding} color="inherit" >OPTION 3</Typography>
                 </div>
                 <Link to='/login'>Log In</Link>
             </Toolbar>

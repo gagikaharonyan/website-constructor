@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Firebase from "../../../Firebase/Firebase";
 
 const useStyles = makeStyles({
     root: {
@@ -24,6 +25,13 @@ export default function BasicTextFields() {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log(login + password)
+        Firebase.doSignInWithEmailAndPassword(login,password).then(function (data) {
+            if (data && data.user && data.user.uid) {
+                console.log('data',data.user.uid)
+            }
+        }).catch(function (error) {
+            console.log('error',error)
+        })
     }
     return (
         <form className={classes.root} autoComplete="off" onSubmit={handleSubmit}>
