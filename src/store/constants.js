@@ -1,0 +1,6 @@
+/* Main */
+export const CHANGE_ADMIN_STATUS = 'CHANGE_ADMIN_STATUS'
+export const CHANGE_LANGUAGE = 'CHANGE_LANGUAGE'
+/* Home Page */
+export const CHANGE_PAGE_DATA = 'CHANGE_PAGE_DATA'
+

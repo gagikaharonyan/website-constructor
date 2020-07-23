@@ -1,0 +1,25 @@
+{
+  "_general_": "*** General ***",
+  "site_name": "Website constructor",
+  "company_name": "Web Company",
+  "location": "Armenia, Yerevan",
+  "phone_number_": "+(374) 010 234567",
+
+  "_login_": "*** Login Page ***",
+  "login": "Login",
+  "logout": "Logout",
+  "password": "Password",
+  "log_in": "Log In",
+  "error_reg_login": "Incorrect login",
+  "error_reg_pass": "Incorrect password",
+  "error_login_message": "An error occurred during login, please check your input data!",
+
+
+  "_main_": "*** Main ***",
+  "_left_aside_": "** Left Aside **",
+  "pages_": "Pages",
+  "slide_banner": "Slide / banner",
+  "post": "Post",
+  "quote": "Quote",
+  "video": "Video"
+}

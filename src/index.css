@@ -11,3 +11,22 @@ a {
   text-decoration: none;
   color: black;
 }
+
+#root .App{
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    min-height: 100vh;
+}
+
+.main-header {
+    flex: 0 1 auto;
+}
+
+.main-content {
+    flex: 1 1 auto;
+}
+
+.main-footer {
+    flex: 0 1 auto;
+}

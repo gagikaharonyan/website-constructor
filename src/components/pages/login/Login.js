@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import LoginForm from './LoginForm';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import LoginForm from './LoginForm';
+import Layout from '../../../hoc/layout/Layout'
 
 const useStyle = makeStyles({
     root: {
@@ -12,9 +13,13 @@ const useStyle = makeStyles({
 
 function Login(props) {
     const classes = useStyle();
-    return (<div className={classes.root}>
-        <LoginForm/>
-    </div>);
+    const {lang} = props
+
+    return (
+        <div className={classes.root}>
+            <LoginForm lang={lang}/>
+        </div>
+    );
 }
 
-export default Login;
+export default Layout(Login,"login");
