@@ -1,16 +1,24 @@
 import React from 'react';
-import {ListItem, ListItemIcon, ListItemText,ListSubheader } from '@material-ui/core';
-import {PostAdd, FormatQuote, Dashboard, YouTube, Pages, Assignment} from '@material-ui/icons';
+import {makeStyles} from '@material-ui/core/styles';
+import {ListItem, ListItemIcon, ListItemText, ListSubheader} from '@material-ui/core';
+import {PostAdd, Pages, AssignmentLate, EventAvailable} from '@material-ui/icons';
+
+/* Pages settings tools */
+import PagesSettingsList from "../constructor/pagesComponents/PagesSettingsList";
+
+const useStyles = makeStyles(() => ({
+    title: {
+        color: 'black',
+    },
+}));
 
 function MainListItems(props) {
     const {lang, pageCreator} = props;
 
     const firstList = [
         {id:1, name: lang.pages_, icon: <Pages />, type: "nav-bar"},
-        {id:2, name: lang.slide_banner, icon: <Dashboard />, type: "banner"},
-        {id:3, name: lang.post, icon: <PostAdd />, type: "post"},
-        {id:4, name: lang.quote, icon: <FormatQuote />, type: "quote"},
-        {id:5, name: lang.video, icon: <YouTube />, type: "video"},
+        {id:2, name: lang.post, icon: <PostAdd />, type: "post"},
+        {id:3, name: lang.event, icon: <EventAvailable />, type: "event"},
     ];
 
     return(
@@ -27,29 +35,33 @@ function MainListItems(props) {
     );
 }
 
-function SecondaryListItems(){
+function SecondaryListItems(props){
+    const classes = useStyles();
+    const {lang, activeAction, showPagesSettings} = props;
+
+    const notSelected = (
+            <ListItem button>
+                <ListItemIcon>
+                    <AssignmentLate />
+                </ListItemIcon>
+                <ListItemText primary={lang.section_not_selected} />
+            </ListItem>
+        );
 
     return (
         <div>
-            <ListSubheader inset>Empowerment</ListSubheader>
-            <ListItem button>
-                <ListItemIcon>
-                    <Assignment />
-                </ListItemIcon>
-                <ListItemText primary="Current type" />
-            </ListItem>
-            <ListItem button>
-                <ListItemIcon>
-                    <Assignment />
-                </ListItemIcon>
-                <ListItemText primary="Last type" />
-            </ListItem>
-            <ListItem button>
-                <ListItemIcon>
-                    <Assignment />
-                </ListItemIcon>
-                <ListItemText primary="New type" />
-            </ListItem>
+            <ListSubheader inset className={classes.title}>{lang.advanced_settings}</ListSubheader>
+
+            {/* constructor settings tools section */}
+            {(() => {
+                switch (activeAction) {
+                    case "nav-bar":
+                        return <PagesSettingsList lang={lang} showPagesSettings={showPagesSettings}/>
+                    case "post":
+                    case "event":
+                    default: return notSelected;
+                }
+            })()}
         </div>
     );
 }

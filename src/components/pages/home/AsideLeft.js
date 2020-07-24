@@ -1,4 +1,5 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import {Drawer, List, Divider, IconButton} from '@material-ui/core';
@@ -42,7 +43,8 @@ const useStyles = makeStyles((theme) => ({
 export default function AsideLeft(props) {
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
-    const {lang, pageCreator} = props;
+    const {home} = useSelector(state => state);
+    const {lang, pageCreator, showPagesSettings} = props;
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -80,7 +82,13 @@ export default function AsideLeft(props) {
                 <Divider />
                 <List><MainListItems lang={lang} pageCreator={pageCreator}/></List>
                 <Divider />
-                <List><SecondaryListItems /></List>
+                <List>
+                    <SecondaryListItems
+                        lang={lang}
+                        activeAction={home.currentAction}
+                        showPagesSettings={showPagesSettings}
+                    />
+                </List>
             </Drawer>
         </>
     );

@@ -1,7 +1,16 @@
 import {CHANGE_PAGE_DATA} from '../constants'
 
 const initState = {
-    site: {},
+    currentAction: "",
+    currentSetting: "",
+    site: {
+        navBar: {
+            pages: [],
+            backgroundColor: "",
+            color: "",
+            fontFamily: "",
+        },
+    },
 }
 
 const homeReducer = (state= initState,{type,payload}) => {
@@ -9,7 +18,7 @@ const homeReducer = (state= initState,{type,payload}) => {
         case CHANGE_PAGE_DATA:
             return {
                 ...state,
-                site: {...payload}
+                ...payload
             }
         default:
             return state

@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function Banner() {
+export default function Events() {
     return (
         <div>
-            Banner Section!
+            Events Section!
         </div>
     )
 }
