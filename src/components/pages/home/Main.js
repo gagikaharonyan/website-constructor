@@ -1,11 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {Container, Grid} from '@material-ui/core';
-import NavBar from "../constructor/NavBar";
-import Banner from "../constructor/Banner";
+import Pages from "../constructor/Pages";
+import Events from "../constructor/Events";
 import Post from "../constructor/Post";
-import Quote from "../constructor/Quote";
-import Video from "../constructor/Video";
 import UnknownSection from "../constructor/UnknownSection";
 
 const useStyles = makeStyles((theme) => ({
@@ -23,28 +21,24 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Main(props) {
     const classes = useStyles();
-    const {activeAction} = props
+    const {lang, activeAction} = props
 
     return (
         <main className={classes.content}>
             <div className={classes.appBarSpacer} />
             <Container maxWidth="lg" className={`${classes.container}`}>
                 <Grid container spacing={3}>
-                    <Grid item xs={12} md={8} lg={9}>
+                    <Grid item xs={12}>
                         {/* constructor work section */}
                         {(() => {
                             switch (activeAction) {
                                 case "nav-bar":
-                                    return <NavBar />
-                                case "banner":
-                                    return <Banner />
+                                    return <Pages lang={lang}/>
+                                case "event":
+                                    return <Events lang={lang}/>
                                 case "post":
-                                    return <Post />
-                                case "quote":
-                                    return <Quote />
-                                case "video":
-                                    return <Video />
-                                default: return <UnknownSection/>
+                                    return <Post lang={lang}/>
+                                default: return <UnknownSection lang={lang}/>
                             }
                         })()}
                     </Grid>
