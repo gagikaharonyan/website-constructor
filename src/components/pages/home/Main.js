@@ -4,6 +4,7 @@ import {Container, Grid} from '@material-ui/core';
 import Pages from "../constructor/Pages";
 import Events from "../constructor/Events";
 import Post from "../constructor/Post";
+import ContactUs from "../constructor/ContactUs";
 import UnknownSection from "../constructor/UnknownSection";
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +39,8 @@ export default function Main(props) {
                                     return <Events lang={lang}/>
                                 case "post":
                                     return <Post lang={lang}/>
+                                case "contactUs":
+                                    return <ContactUs lang={lang}/>
                                 default: return <UnknownSection lang={lang}/>
                             }
                         })()}

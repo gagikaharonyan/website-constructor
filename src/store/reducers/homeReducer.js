@@ -5,13 +5,22 @@ const initState = {
     currentSetting: "",
     site: {
         navBar: {
-            pages: [],
+            pages: [
+                {name: 'home'},
+                {name: 'posts'},
+                {name: 'events'},
+            ],
             backgroundColor: "",
             color: "",
             fontFamily: "",
         },
+        contactUs: [
+            {type: 'EMAIL', text: ''},
+            {type: 'PHONE_NUMBER', text: ''},
+            {type: 'LOCATION', text: ''},
+        ],
     },
-}
+};
 
 const homeReducer = (state= initState,{type,payload}) => {
     switch (type) {

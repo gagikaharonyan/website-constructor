@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import {connect, useSelector} from 'react-redux';
+import {change_page_data} from "../../../store/actions/homeAction";
 import { makeStyles } from '@material-ui/core/styles';
 import {Grid, Paper, Button} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
@@ -44,13 +46,14 @@ const initPages = [
 ];
 
 const initDefaultPages = [
-    {name: 'home', title: 'home', state: false},
-    {name: 'posts', title: 'posts', state: false},
-    {name: 'events', title: 'events', state: false},
+    {name: 'home'},
+    {name: 'posts'},
+    {name: 'events'},
 ];
 
-export default function Pages(props) {
+function Pages(props) {
     const classes = useStyles();
+    const {home} = useSelector(state => state);
     const [pagesList, setPagesList] = useState([...initPages]);
     const [selectedPages, setSelectedPages] = useState([...initDefaultPages]);
     const {lang} = props;
@@ -64,12 +67,23 @@ export default function Pages(props) {
 
             }
             if(item.state === true){
-                tempPages.push({name: item.title})
+                tempPages.push({name: item.name})
             }
             return item;
         })
         setPagesList([...tempState]);
         setSelectedPages([...tempPages]);
+        props.changeHomeState({
+                ...home,
+                site: {
+                    ...home.site,
+                    navBar: {
+                        ...home.site.pages,
+                        pages: [...tempPages],
+                    }
+                }
+            }
+        );
     }
 
     return (
@@ -120,3 +134,17 @@ export default function Pages(props) {
         </div>
     );
 }
+
+const mapStateToProps = state => {
+    return {
+        ...state
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        changeHomeState: (data) => {dispatch(change_page_data(data))},
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Pages)

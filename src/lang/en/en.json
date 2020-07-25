@@ -52,5 +52,10 @@
   "save": "save",
   "apply": "Apply",
   "font_example": "Font example",
-  "save_all_changes": "Save all changes"
+  "save_all_changes": "Save all changes",
+  "contact_us_data": "Contact us data",
+  "email": "E-mail",
+  "phone_number": "Phone number",
+  "location_address": "Address",
+  "incorrect_data": "You entered incorrect data!"
 }
