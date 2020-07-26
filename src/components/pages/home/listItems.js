@@ -6,6 +6,7 @@ import {PostAdd, Pages, AssignmentLate, EventAvailable, ContactPhone, Group} fro
 
 /* Pages settings tools */
 import PagesSettingsList from "../constructor/pagesComponents/PagesSettingsList";
+import EventsSettingsList from "../constructor/eventsComponents/EventsSettingsList";
 
 const useStyles = makeStyles(() => ({
     title: {
@@ -20,7 +21,7 @@ function MainListItems(props) {
     const firstList = [
         {id:1, name: lang.pages_, icon: <Pages />, type: "nav-bar"},
         {id:2, name: lang.post, icon: <PostAdd />, type: "post"},
-        {id:3, name: lang.event, icon: <EventAvailable />, type: "event"},
+        {id:3, name: lang.events, icon: <EventAvailable />, type: "events"},
     ];
 
     if(home.site.navBar.pages.filter(page => page.name === "aboutUs").length > 0){
@@ -67,8 +68,9 @@ function SecondaryListItems(props){
                 switch (activeAction) {
                     case "nav-bar":
                         return <PagesSettingsList lang={lang} showPagesSettings={showPagesSettings}/>
+                    case "events":
+                        return <EventsSettingsList lang={lang} showPagesSettings={showPagesSettings}/>
                     case "post":
-                    case "event":
                     default: return notSelected;
                 }
             })()}

@@ -19,6 +19,7 @@ const initState = {
             {type: 'PHONE_NUMBER', text: ''},
             {type: 'LOCATION', text: ''},
         ],
+        events: {},
     },
 };
 
@@ -34,4 +35,4 @@ const homeReducer = (state= initState,{type,payload}) => {
     }
 }
 
-export default homeReducer
+export default homeReducer;

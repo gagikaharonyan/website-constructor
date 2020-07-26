@@ -57,5 +57,21 @@
   "email": "E-mail",
   "phone_number": "Phone number",
   "location_address": "Address",
-  "incorrect_data": "You entered incorrect data!"
+  "incorrect_data": "You entered incorrect data!",
+  "title": "Title",
+  "details": "Details",
+  "date": "Date",
+  "error_event_required_fields": "The details and title fields are required!",
+  "select_image": "Select image",
+  "image_warning": "File format is not supported!\n                    Please add files from the following types - jpg, jpeg, png, gif.",
+  "add_event_content": "Add event content...",
+  "event_successfully_added": "Events successfully added!",
+  "event_successfully_updated": "Event successfully updated",
+  "all_events": "All events",
+  "new_event": "New event",
+  "event_list_empty": "Event list is empty",
+  "edit": "Edit",
+  "delete": "Delete",
+  "update": "Update",
+  "event_deleted_successfully": "Event deleted successfully!"
 }

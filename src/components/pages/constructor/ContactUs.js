@@ -119,7 +119,7 @@ function ContactUs(props) {
             <Paper className={classes.paper}>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
-                        <h2 className={`${classes.h1}`}>{lang.contact_us_data}:</h2>
+                        <h2 className={`${classes.h1}`}>{lang.contact_us_data}</h2>
                     </Grid>
                     <Grid item xs={12}>
                         <form className={classes.form} autoComplete="off" onSubmit={(ev) => saveContactsData(ev)}>
@@ -185,4 +185,4 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(ContactUs)
+export default connect(mapStateToProps,mapDispatchToProps)(ContactUs);

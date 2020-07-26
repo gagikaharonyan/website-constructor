@@ -35,7 +35,7 @@ export default function Main(props) {
                             switch (activeAction) {
                                 case "nav-bar":
                                     return <Pages lang={lang}/>
-                                case "event":
+                                case "events":
                                     return <Events lang={lang}/>
                                 case "post":
                                     return <Post lang={lang}/>

@@ -21,7 +21,7 @@ function Home(props) {
 
     const pageCreator = (type) => {
         setTempPageSection(type);
-        props.changeHomeState({...home, currentAction: type});
+        props.changeHomeState({...home, currentAction: type, currentSetting: ""});
     }
 
     const showPagesSettings = (type) => {
@@ -40,7 +40,7 @@ function Home(props) {
                 <Main lang={lang} activeAction={tempPageSection}/>
             </div>
         </div>
-    )
+    );
 }
 
 const mapStateToProps = state => {
@@ -55,4 +55,4 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(Layout(Home))
+export default connect(mapStateToProps,mapDispatchToProps)(Layout(Home));
