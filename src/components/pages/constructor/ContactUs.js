@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {connect, useSelector} from 'react-redux';
 import {change_page_data} from "../../../store/actions/homeAction";
 import {useToasts} from 'react-toast-notifications';
 import {makeStyles} from '@material-ui/core/styles';
 import {Paper, Grid, TextField, Button} from '@material-ui/core';
+import Loader from "react-loader-spinner";
+import FirebaseFunctions from "../../../Firebase/FirebaseFunctions";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,6 +35,13 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 30,
         textShadow: '0px 4px 3px rgba(0,0,0,0.4), 0px 3px 6px rgba(0, 0, 0, 0.25), 0px 18px 23px rgba(0,0,0,0.1);',
     },
+    loader: {
+        margin: '0 10px',
+        '& figure > div': {
+            verticalAlign: 'middle',
+            display: 'inline-block',
+        },
+    },
 }));
 
 const email_reg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -55,7 +64,54 @@ function ContactUs(props) {
     const {home} = useSelector(state => state);
     const [contacts, setContacts] = useState(initContacts);
     const [noValid, setNoValid] = useState(initValidation);
+    const [_loader, setLoader] = useState(false);
     const {lang} = props;
+
+    useEffect(function () {
+        const temp = home.site.contactUs;
+        if(temp[0].text !== ""){
+            const dataObj = {};
+            temp.map(item => {
+                let key = Object.keys(item)[0];
+                dataObj[key] = item[key];
+            });
+            setContacts({...dataObj});
+        }else{
+            getContactsData();
+        }
+    }, []);
+
+
+    const getContactsData = () => {
+        FirebaseFunctions.getData("contacts")
+            .then(response => {
+                if (response.length > 0) {
+                    const dataObj = {};
+                    const dataArr = response.map(item => {
+                        dataObj[item.type] = item.text;
+                        return {[item.type]:item.text};
+                    });
+                    setContacts({...dataObj});
+                    props.changeHomeState(
+                        {
+                            ...home,
+                            site: {
+                                ...home.site,
+                                contactUs: [
+                                    ...dataArr
+                                ],
+                            }
+                        }
+                    );
+                }
+            })
+            .catch(error => {
+                addToast(error.message, {
+                    appearance: 'error',
+                    autoDismiss: true,
+                })
+            });
+    }
 
     const handleChange = (ev) => {
         ev.preventDefault();
@@ -92,7 +148,7 @@ function ContactUs(props) {
     const saveContactsData = (ev) => {
         ev.preventDefault();
         const updateData = Object.keys(contacts).map(item => {
-            return {type: item, item: contacts[item]}
+            return {text: contacts[item], type: item}
         });
 
         if(noValid.phone || noValid.email){
@@ -101,16 +157,35 @@ function ContactUs(props) {
                 autoDismiss: true,
             });
         }else {
-            props.changeHomeState({
-                    ...home,
-                    site: {
-                        ...home.site,
-                        contactUs: [
-                            ...updateData
-                        ],
+            setLoader(true);
+            FirebaseFunctions.updateData("contacts", {...updateData})
+                .then(response => {
+                    setLoader(false);
+                    if(response.result){
+                        addToast(lang.data_updated_successfully, {
+                            appearance: 'success',
+                            autoDismiss: true,
+                        });
+                        props.changeHomeState(
+                            {
+                                ...home,
+                                site: {
+                                    ...home.site,
+                                    contactUs: [
+                                        ...updateData
+                                    ],
+                                }
+                            }
+                        );
                     }
-                }
-            );
+                })
+                .catch(error => {
+                    setLoader(false);
+                    addToast(error.message, {
+                        appearance: 'error',
+                        autoDismiss: true,
+                    });
+                });
         }
     }
 
@@ -159,8 +234,13 @@ function ContactUs(props) {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button variant="contained" color="primary" type={"submit"}>
+                                    <Button variant="contained" color="primary" type={"submit"} disabled={_loader}>
                                         {lang.save}
+                                        {_loader ?
+                                            <figure className={classes.loader}>
+                                                <Loader type="ThreeDots" color="#fff" height={15} width={40}/>
+                                            </figure> : null
+                                        }
                                     </Button>
                                 </Grid>
                             </Grid>

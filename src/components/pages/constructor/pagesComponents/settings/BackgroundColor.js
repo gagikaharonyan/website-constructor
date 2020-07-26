@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {connect, useSelector} from 'react-redux';
 import {change_page_data} from "../../../../../store/actions/homeAction";
 import {makeStyles} from '@material-ui/core/styles';
@@ -28,6 +28,12 @@ function BackgroundColor(props) {
     const {home} = useSelector(state => state);
     const [color, setColor] = useState("#ffffff");
     const {lang} = props;
+
+    useEffect(function () {
+        if(home.site.navBar.backgroundColor !== ""){
+            setColor(home.site.navBar.backgroundColor);
+        }
+    },[]);
 
     const changeColor = (color) => {
         setColor(color)

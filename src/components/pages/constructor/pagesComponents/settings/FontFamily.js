@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {connect, useSelector} from 'react-redux';
 import {change_page_data} from "../../../../../store/actions/homeAction";
 import {makeStyles} from '@material-ui/core/styles';
@@ -28,6 +28,12 @@ function FontFamily(props) {
     const {home} = useSelector(state => state);
     const [font, setFont] = useState("");
     const {lang} = props;
+
+    useEffect(function () {
+        if(home.site.navBar.backgroundColor !== ""){
+            setFont(home.site.navBar.fontFamily);
+        }
+    },[]);
 
     const changeFont = (type) => {
         setFont(type)

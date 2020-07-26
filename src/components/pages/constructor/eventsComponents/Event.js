@@ -275,7 +275,7 @@ function Event(props) {
     }
 
     const updateEvent = (data, id) => {
-        FirebaseFunctions.updateData("events", id, {...data})
+        FirebaseFunctions.updateDataById("events", id, {...data})
             .then(response => {
                 setLoader(false);
                 if(response.result){

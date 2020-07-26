@@ -34,6 +34,8 @@
   "events": "Events",
   "about_us": "About Us",
   "contact_us": "Contact Us",
+  "aboutUs": "About Us",
+  "contactUs": "Contact Us",
   "info_pages": "In this section you can manage site pages.",
   "add_plus": "+ Add",
   "remove_minus": "- Remove",
@@ -73,5 +75,6 @@
   "edit": "Edit",
   "delete": "Delete",
   "update": "Update",
-  "event_deleted_successfully": "Event deleted successfully!"
+  "event_deleted_successfully": "Event deleted successfully!",
+  "data_updated_successfully": "Data updated successfully!"
 }
