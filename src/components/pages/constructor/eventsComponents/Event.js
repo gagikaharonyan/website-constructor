@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {connect, useSelector} from 'react-redux';
-import {change_page_data} from "../../../../store/actions/homeAction";
+import {change_events_state, change_page_data} from "../../../../store/actions/homeAction";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {useToasts} from 'react-toast-notifications';
@@ -258,9 +258,7 @@ function Event(props) {
                         autoDismiss: true,
                     });
                     const tempEvents = Object.assign({}, {...home.site.events, [id]: {...data}});
-                    props.changeHomeState({
-                        ...home, site: {...home.site, events: {...tempEvents}}}
-                    );
+                    props.changeEventsState({...tempEvents});
                     setNewEvent({...initEvent});
                     setSelectedDate(new Date());
                 }
@@ -284,9 +282,7 @@ function Event(props) {
                         autoDismiss: true,
                     });
                     const tempEvents = Object.assign({}, {...home.site.events, [id]: {...data}});
-                    props.changeHomeState({
-                        ...home, site: {...home.site, events: {...tempEvents}}}
-                    );
+                    props.changeEventsState({...tempEvents});
                 }
             })
             .catch(error => {
@@ -418,6 +414,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
+        changeEventsState: (data) => {dispatch(change_events_state(data))},
     }
 }
 

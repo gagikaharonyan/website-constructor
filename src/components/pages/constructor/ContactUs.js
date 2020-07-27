@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {connect, useSelector} from 'react-redux';
-import {change_page_data} from "../../../store/actions/homeAction";
+import {change_page_data,change_contact_us_state} from "../../../store/actions/homeAction";
 import {useToasts} from 'react-toast-notifications';
 import {makeStyles} from '@material-ui/core/styles';
 import {Paper, Grid, TextField, Button} from '@material-ui/core';
@@ -89,20 +89,10 @@ function ContactUs(props) {
                     const dataObj = {};
                     const dataArr = response.map(item => {
                         dataObj[item.type] = item.text;
-                        return {[item.type]:item.text};
+                        return {type: item.type, text:item.text};
                     });
                     setContacts({...dataObj});
-                    props.changeHomeState(
-                        {
-                            ...home,
-                            site: {
-                                ...home.site,
-                                contactUs: [
-                                    ...dataArr
-                                ],
-                            }
-                        }
-                    );
+                    props.changeContactUsState( [ ...dataArr]);
                 }
             })
             .catch(error => {
@@ -166,17 +156,7 @@ function ContactUs(props) {
                             appearance: 'success',
                             autoDismiss: true,
                         });
-                        props.changeHomeState(
-                            {
-                                ...home,
-                                site: {
-                                    ...home.site,
-                                    contactUs: [
-                                        ...updateData
-                                    ],
-                                }
-                            }
-                        );
+                        props.changeContactUsState( [ ...updateData]);
                     }
                 })
                 .catch(error => {
@@ -262,6 +242,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
+        changeContactUsState: (data) => {dispatch(change_contact_us_state(data))},
     }
 }
 

@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {connect, useSelector} from 'react-redux';
-import {change_page_data} from "../../../store/actions/homeAction";
+import {change_current_settings, change_page_data,change_events_state} from "../../../store/actions/homeAction";
 import {useToasts} from "react-toast-notifications";
 import Event from './eventsComponents/Event';
 import EventsList from "./eventsComponents/EventsList";
@@ -26,7 +26,7 @@ function Events(props) {
 
     const editEvent = (id) => {
         setEditEventData({...home.site.events[id]});
-        props.changeHomeState({...home, currentSetting: "editEvent"});
+        props.changeCurrentSettings("editEvent");
     }
 
     const getEventsData = () => {
@@ -34,7 +34,7 @@ function Events(props) {
             .then(response => {
                 if(Object.keys(response).length > 0){
                     setEventsData({...response});
-                    props.changeHomeState({...home,site: {...home.site, events: {...response}}});
+                    props.changeEventsState({...response});
                 }
             })
             .catch(error => {
@@ -69,6 +69,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
+        changeCurrentSettings: (data) => {dispatch(change_current_settings(data))},
+        changeEventsState: (data) => {dispatch(change_events_state(data))},
     }
 }
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {connect, useSelector} from 'react-redux';
-import {change_page_data} from "../../../../../store/actions/homeAction";
+import {change_page_data,change_nav_bar_settings} from "../../../../../store/actions/homeAction";
 import {makeStyles} from '@material-ui/core/styles';
 import {Button, Radio, RadioGroup, FormControlLabel, FormControl} from '@material-ui/core';
 
@@ -41,17 +41,7 @@ function FontFamily(props) {
 
     const setNewFont = (ev) => {
         ev.preventDefault();
-        props.changeHomeState({
-                ...home,
-                site: {
-                    ...home.site,
-                    navBar: {
-                        ...home.site.navBar,
-                        fontFamily: font,
-                    }
-                }
-            }
-        );
+        props.changeNavBarSettings("fontFamily", font);
     }
 
     return (
@@ -91,6 +81,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
+        changeNavBarSettings: (name, data) => {dispatch(change_nav_bar_settings(name, data))},
     }
 }
 

@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {connect, useSelector} from 'react-redux';
-import {change_page_data} from "../../../store/actions/homeAction";
+import {change_nav_bar_data, change_page_data} from "../../../store/actions/homeAction";
 import { makeStyles } from '@material-ui/core/styles';
 import {Grid, Paper, Button} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
@@ -89,15 +89,7 @@ function Pages(props) {
                         return item;
                     });
                     setPagesList([...updatePageState]);
-                    props.changeHomeState(
-                        {
-                            ...home,
-                            site: {
-                                ...home.site,
-                                navBar: {...response}
-                            }
-                        }
-                    );
+                    props.changeNavBarState({...response});
                 }
             })
             .catch(error => {
@@ -110,7 +102,7 @@ function Pages(props) {
 
     const addRemovePage = (state, name) => {
         const tempState = [...pagesList];
-        const tempPages = [...initDefaultPages];
+        const tempPages = [];
         tempState.map(item => {
             if(item.name === name){
                 item.state = !item.state;
@@ -122,15 +114,10 @@ function Pages(props) {
         })
         setPagesList([...tempState]);
         setSelectedPages([...tempPages]);
-        props.changeHomeState({
-                ...home,
-                site: {
-                    ...home.site,
-                    navBar: {
-                        ...home.site.navBar,
-                        pages: [...tempPages],
-                    }
-                }
+
+        props.changeNavBarState({
+                ...home.site.navBar,
+                pages: [...tempPages],
             }
         );
     }
@@ -219,6 +206,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
+        changeNavBarState: (data) => {dispatch(change_nav_bar_data(data))},
     }
 }
 
