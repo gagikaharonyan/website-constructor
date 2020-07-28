@@ -7,6 +7,7 @@ import * as serviceWorker from './serviceWorker';
 import {BrowserRouter as Router} from 'react-router-dom';
 import App from './App';
 import './index.css';
+import "antd/dist/antd.css";
 
 ReactDOM.render(
     <ProviderRedux store={store}>

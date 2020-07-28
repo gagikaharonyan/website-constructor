@@ -5,6 +5,7 @@ import {PostAdd, Pages, AssignmentLate, EventAvailable} from '@material-ui/icons
 
 /* Pages settings tools */
 import PagesSettingsList from "../constructor/pagesComponents/PagesSettingsList";
+import PostSettings from "../constructor/postsComponents/PostSettingsList";
 
 const useStyles = makeStyles(() => ({
     title: {
@@ -58,6 +59,7 @@ function SecondaryListItems(props){
                     case "nav-bar":
                         return <PagesSettingsList lang={lang} showPagesSettings={showPagesSettings}/>
                     case "post":
+                        return <PostSettings lang={lang} showPagesSettings={showPagesSettings}/>
                     case "event":
                     default: return notSelected;
                 }
