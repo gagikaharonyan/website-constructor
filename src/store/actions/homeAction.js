@@ -65,8 +65,8 @@ export const add_update_slider_image = (data) => {
     return {
         type: ADD_UPDATE_SLIDER_IMAGE, payload : data
     }
-};
 }
+
 
 export const getAllListPosts = () => {
     return (dispatch) => {

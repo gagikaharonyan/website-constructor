@@ -39,7 +39,7 @@ const initState = {
                 loading: false,
                 entry: {},
             }
-        }
+        },
         contactUs: [],
         events: {},
     },
