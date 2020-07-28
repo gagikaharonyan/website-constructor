@@ -155,6 +155,18 @@ const getData = (table) => {
     });
 }
 
+/* Deleting image by name from storage */ /* (public) */
+const deleteImageByName = (directory, name) => {
+    return new Promise(function(resolve, reject) {
+        let storageRef = Firebase.storage.ref(`storage/images/${directory}/`)
+        storageRef.child(name).delete().then(function() {
+            resolve({result: true});
+        }).catch(function(error) {
+            reject({message: `Database error. ${directory} data! ${error.message}`});
+        });
+    });
+};
+
 const FirebaseFunctions = {
     addNewData, // add new data in firebase db
     uploadImage, // upload image in firebase store
@@ -163,6 +175,7 @@ const FirebaseFunctions = {
     updateDataById, // update data by id in firebase db
     updateData, // update data in firebase db
     getData, // get data from firebase db
+    deleteImageByName, // delete image by name from firebase store
 };
 
 export default FirebaseFunctions;

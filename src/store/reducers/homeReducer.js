@@ -6,6 +6,8 @@ import {
     CHANGE_EVENTS_STATE,
     CHANGE_CONTACT_US_STATE,
     ADD_CONTACT_DATA,
+    ADD_UPDATE_NETWORKS_LINKS,
+    ADD_UPDATE_SLIDER_IMAGE,
 } from '../constants';
 
 const initState = {
@@ -21,6 +23,8 @@ const initState = {
             backgroundColor: "",
             color: "",
             fontFamily: "",
+            networks: {},
+            slider: [],
         },
         contactUs: [],
         events: {},
@@ -72,6 +76,24 @@ const homeReducer = (state= initState,{type,payload}) => {
                 ...state, site: {
                     ...state.site,
                     contactUs: [...state.site.contactUs, payload]
+                }
+            }
+        case ADD_UPDATE_NETWORKS_LINKS:
+            return {
+                ...state, site: {
+                    ...state.site, navBar: {
+                        ...state.site.navBar,
+                        networks: {...payload}
+                    }
+                }
+            }
+        case ADD_UPDATE_SLIDER_IMAGE:
+            return {
+                ...state, site: {
+                    ...state.site, navBar: {
+                        ...state.site.navBar,
+                        slider: [...payload]
+                    }
                 }
             }
         default:

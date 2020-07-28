@@ -81,5 +81,17 @@
   "emails": "E-mail(s)",
   "phones": "Phone(s)",
   "addresses": "Address(es)",
-  "no_data": "No data"
+  "no_data": "No data",
+  "social_networks": "Social networks",
+  "slider_images": "Slider images",
+  "add_link": "Add link",
+  "network": "Network",
+  "none": "None",
+  "link": "Link",
+  "links": "Links",
+  "add_images": "Add images",
+  "images": "Images",
+  "error_empty_value": "You cannot add an empty value!",
+  "error_empty_image": "You have not selected an image to add!",
+  "warning_image": "After deleting images the image file is deleted from the storage location, but the link remains in the database, to avoid errors don't forget to save all changes after deleting the image!"
 }
