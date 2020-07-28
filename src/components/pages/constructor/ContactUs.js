@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {connect, useSelector} from 'react-redux';
-import {change_page_data,change_contact_us_state} from "../../../store/actions/homeAction";
+import {change_page_data,change_contact_us_state,add_contact_data} from "../../../store/actions/homeAction";
 import {useToasts} from 'react-toast-notifications';
 import {makeStyles} from '@material-ui/core/styles';
 import {Paper, Grid, TextField, Button} from '@material-ui/core';
+import {Add, Save, Delete, AlternateEmail, PhoneIphone, Business, Clear} from '@material-ui/icons';
 import Loader from "react-loader-spinner";
 import FirebaseFunctions from "../../../Firebase/FirebaseFunctions";
 
@@ -15,12 +16,13 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary,
-        height: 500,
+        minHeight: 500,
+        height: "auto",
         fontSize: 20,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        '& span': {
+        '& > span': {
             marginLeft: 5,
         },
     },
@@ -40,6 +42,36 @@ const useStyles = makeStyles((theme) => ({
         '& figure > div': {
             verticalAlign: 'middle',
             display: 'inline-block',
+        },
+    },
+    inputSection: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    contactData: {
+        textAlign: "left",
+    },
+    h4: {
+        display: "flex",
+        fontSize: 17,
+    },
+    noData: {
+        display: "flex",
+        alignItems: "center",
+        fontSize: 15,
+    },
+    delItem: {
+        position: "relative",
+        marginLeft: 15,
+        '& span svg': {
+            position: 'absolute',
+            fontSize: 13,
+            color: 'black',
+        },
+        '& span:hover svg': {
+            color: 'red',
+            cursor: 'pointer',
         },
     },
 }));
@@ -66,17 +98,11 @@ function ContactUs(props) {
     const [noValid, setNoValid] = useState(initValidation);
     const [_loader, setLoader] = useState(false);
     const {lang} = props;
+    const contactsData = home.site.contactUs;
 
     useEffect(function () {
         const temp = home.site.contactUs;
-        if(temp[0].text !== ""){
-            const dataObj = {};
-            temp.map(item => {
-                let key = Object.keys(item)[0];
-                dataObj[key] = item[key];
-            });
-            setContacts({...dataObj});
-        }else{
+        if(!temp[0]){
             getContactsData();
         }
     }, []);
@@ -86,12 +112,9 @@ function ContactUs(props) {
         FirebaseFunctions.getData("contacts")
             .then(response => {
                 if (response.length > 0) {
-                    const dataObj = {};
                     const dataArr = response.map(item => {
-                        dataObj[item.type] = item.text;
                         return {type: item.type, text:item.text};
                     });
-                    setContacts({...dataObj});
                     props.changeContactUsState( [ ...dataArr]);
                 }
             })
@@ -135,38 +158,45 @@ function ContactUs(props) {
         }
     }
 
-    const saveContactsData = (ev) => {
-        ev.preventDefault();
-        const updateData = Object.keys(contacts).map(item => {
-            return {text: contacts[item], type: item}
-        });
-
+    const addNewInfo = (type) => {
         if(noValid.phone || noValid.email){
             addToast(lang.incorrect_data, {
                 appearance: 'error',
                 autoDismiss: true,
             });
         }else {
-            setLoader(true);
-            FirebaseFunctions.updateData("contacts", {...updateData})
-                .then(response => {
-                    setLoader(false);
-                    if(response.result){
-                        addToast(lang.data_updated_successfully, {
-                            appearance: 'success',
-                            autoDismiss: true,
-                        });
-                        props.changeContactUsState( [ ...updateData]);
-                    }
-                })
-                .catch(error => {
-                    setLoader(false);
-                    addToast(error.message, {
-                        appearance: 'error',
+            props.addContactData({type: type, text: contacts[type]});
+            setContacts(prevState => {
+                return {...prevState, [type]: ""};
+            });
+        }
+    }
+
+    const deleteContactData = (item) => {
+        const delData = contactsData.filter(cont => cont.text !== item);
+        props.changeContactUsState([...delData]);
+    }
+
+    const saveContactsData = (ev) => {
+        ev.preventDefault();
+        setLoader(true);
+        FirebaseFunctions.updateData("contacts", {...contactsData})
+            .then(response => {
+                setLoader(false);
+                if(response.result){
+                    addToast(lang.data_updated_successfully, {
+                        appearance: 'success',
                         autoDismiss: true,
                     });
+                }
+            })
+            .catch(error => {
+                setLoader(false);
+                addToast(error.message, {
+                    appearance: 'error',
+                    autoDismiss: true,
                 });
-        }
+            });
     }
 
     return (
@@ -177,9 +207,9 @@ function ContactUs(props) {
                         <h2 className={`${classes.h1}`}>{lang.contact_us_data}</h2>
                     </Grid>
                     <Grid item xs={12}>
-                        <form className={classes.form} autoComplete="off" onSubmit={(ev) => saveContactsData(ev)}>
+                        <form className={classes.form} autoComplete="off">
                             <Grid container spacing={3}>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} className={classes.inputSection}>
                                     <TextField
                                         required
                                         name={"EMAIL"}
@@ -189,8 +219,11 @@ function ContactUs(props) {
                                         error={noValid.email}
                                         onChange={(ev) => handleChange(ev)}
                                     />
+                                    <Button variant="contained" color="primary" onClick={()=>addNewInfo("EMAIL")}>
+                                        <Add /> {lang.add}
+                                    </Button>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} className={classes.inputSection}>
                                     <TextField
                                         required
                                         name={"PHONE_NUMBER"}
@@ -200,8 +233,11 @@ function ContactUs(props) {
                                         error={noValid.phone}
                                         onChange={(ev) => handleChange(ev)}
                                     />
+                                    <Button variant="contained" color="primary" onClick={()=>addNewInfo("PHONE_NUMBER")}>
+                                        <Add /> {lang.add}
+                                    </Button>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} className={classes.inputSection}>
                                     <TextField
                                         required
                                         multiline
@@ -212,9 +248,89 @@ function ContactUs(props) {
                                         value={contacts.LOCATION}
                                         onChange={(ev) => handleChange(ev)}
                                     />
+                                    <Button variant="contained" color="primary" onClick={()=>addNewInfo("LOCATION")}>
+                                        <Add /> {lang.add}
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={12} className={classes.contactData}>
+                                    <h4 className={`${classes.h1} ${classes.h4}`}>
+                                        <AlternateEmail />&nbsp;{lang.emails}
+                                    </h4>
+                                    <hr/>
+                                    <div>
+                                        {contactsData.length > 0 ?
+                                            contactsData.map(item => {
+                                                if (item.type === "EMAIL") {
+                                                    return (
+                                                        <span key={item.text} className={classes.delItem}>
+                                                            {item.text}
+                                                            <span onClick={()=>deleteContactData(item.text)}>
+                                                                <Clear />
+                                                            </span>
+                                                        </span>
+                                                    );
+                                                }
+                                                return null;
+                                            })
+                                            :
+                                            <span className={classes.noData}><Delete /> {lang.no_data}</span>
+                                        }
+                                    </div>
+                                </Grid>
+                                <Grid item xs={12} className={classes.contactData}>
+                                    <h4 className={`${classes.h1} ${classes.h4}`}>
+                                        <PhoneIphone />&nbsp;{lang.phones}
+                                    </h4>
+                                    <hr/>
+                                    <div>
+                                        {contactsData.length > 0 ?
+                                            contactsData.map(item => {
+                                                if(item.type === "PHONE_NUMBER"){
+                                                    return (
+                                                        <span key={item.text} className={classes.delItem}>
+                                                            {item.text}
+                                                            <span onClick={()=>deleteContactData(item.text)}>
+                                                                <Clear />
+                                                            </span>
+                                                        </span>
+                                                    );
+                                                }
+                                                return null;
+                                            })
+                                            :
+                                            <span className={classes.noData}><Delete /> {lang.no_data}</span>
+                                        }
+                                    </div>
+                                </Grid>
+                                <Grid item xs={12} className={classes.contactData}>
+                                    <h4 className={`${classes.h1} ${classes.h4}`}>
+                                        <Business />&nbsp;{lang.addresses}
+                                    </h4>
+                                    <hr/>
+                                    <div>
+                                        {contactsData.length > 0 ?
+                                            contactsData.map(item => {
+                                                if(item.type === "LOCATION"){
+                                                    return (
+                                                        <span key={item.text} className={classes.delItem}>
+                                                            {item.text}
+                                                            <span onClick={()=>deleteContactData(item.text)}>
+                                                                <Clear />
+                                                            </span>
+                                                        </span>
+                                                    );
+                                                }
+                                                return null;
+                                            })
+                                            :
+                                            <span className={classes.noData}><Delete /> {lang.no_data}</span>
+                                        }
+                                    </div>
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Button variant="contained" color="primary" type={"submit"} disabled={_loader}>
+                                    <Button variant="contained" color="primary" type={"submit"} disabled={_loader}
+                                        onClick={(ev) => saveContactsData(ev)}>
+                                        <Save />&nbsp;
                                         {lang.save}
                                         {_loader ?
                                             <figure className={classes.loader}>
@@ -243,6 +359,7 @@ const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
         changeContactUsState: (data) => {dispatch(change_contact_us_state(data))},
+        addContactData: (data) => {dispatch(add_contact_data(data))},
     }
 }
 

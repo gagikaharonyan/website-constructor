@@ -125,7 +125,7 @@ const updateDataById = (table, id, data) => {
 /* Update Data */ /* (public) */
 const updateData = (table, data) => {
     return new Promise(function(resolve, reject) {
-        Firebase.database.ref(table).update(data,function (error) {
+        Firebase.database.ref(table).set(data, function (error) {
             if(error){
                 reject({message: `Database error. '${table}' data! ${error.message}`});
             }else {

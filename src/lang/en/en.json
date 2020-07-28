@@ -76,5 +76,10 @@
   "delete": "Delete",
   "update": "Update",
   "event_deleted_successfully": "Event deleted successfully!",
-  "data_updated_successfully": "Data updated successfully!"
+  "data_updated_successfully": "Data updated successfully!",
+  "add": "Add",
+  "emails": "E-mail(s)",
+  "phones": "Phone(s)",
+  "addresses": "Address(es)",
+  "no_data": "No data"
 }

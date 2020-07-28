@@ -5,6 +5,7 @@ import {
     CHANGE_CURRENT_SETTINGS,
     CHANGE_EVENTS_STATE,
     CHANGE_CONTACT_US_STATE,
+    ADD_CONTACT_DATA,
 } from '../constants';
 
 export const change_page_data = (data) => {
@@ -40,5 +41,11 @@ export const change_events_state = (data) => {
 export const change_contact_us_state = (data) => {
     return {
         type: CHANGE_CONTACT_US_STATE, payload : data
+    }
+};
+
+export const add_contact_data = (data) => {
+    return {
+        type: ADD_CONTACT_DATA, payload : data
     }
 };

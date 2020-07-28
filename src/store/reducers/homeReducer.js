@@ -5,6 +5,7 @@ import {
     CHANGE_CURRENT_SETTINGS,
     CHANGE_EVENTS_STATE,
     CHANGE_CONTACT_US_STATE,
+    ADD_CONTACT_DATA,
 } from '../constants';
 
 const initState = {
@@ -21,11 +22,7 @@ const initState = {
             color: "",
             fontFamily: "",
         },
-        contactUs: [
-            {type: 'EMAIL', text: ''},
-            {type: 'PHONE_NUMBER', text: ''},
-            {type: 'LOCATION', text: ''},
-        ],
+        contactUs: [],
         events: {},
     },
 };
@@ -68,6 +65,13 @@ const homeReducer = (state= initState,{type,payload}) => {
                 ...state, site: {
                     ...state.site,
                     contactUs: [...payload]
+                }
+            }
+        case ADD_CONTACT_DATA:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    contactUs: [...state.site.contactUs, payload]
                 }
             }
         default:
