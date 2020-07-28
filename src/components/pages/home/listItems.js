@@ -1,10 +1,12 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {makeStyles} from '@material-ui/core/styles';
 import {ListItem, ListItemIcon, ListItemText, ListSubheader} from '@material-ui/core';
-import {PostAdd, Pages, AssignmentLate, EventAvailable} from '@material-ui/icons';
+import {PostAdd, Pages, AssignmentLate, EventAvailable, ContactPhone, Group} from '@material-ui/icons';
 
 /* Pages settings tools */
 import PagesSettingsList from "../constructor/pagesComponents/PagesSettingsList";
+import EventsSettingsList from "../constructor/eventsComponents/EventsSettingsList";
 import PostSettings from "../constructor/postsComponents/PostSettingsList";
 
 const useStyles = makeStyles(() => ({
@@ -15,12 +17,21 @@ const useStyles = makeStyles(() => ({
 
 function MainListItems(props) {
     const {lang, pageCreator} = props;
+    const {home} = useSelector(state => state);
 
     const firstList = [
         {id:1, name: lang.pages_, icon: <Pages />, type: "nav-bar"},
         {id:2, name: lang.post, icon: <PostAdd />, type: "post"},
-        {id:3, name: lang.event, icon: <EventAvailable />, type: "event"},
+        {id:3, name: lang.events, icon: <EventAvailable />, type: "events"},
     ];
+
+    if(home.site.navBar.pages.filter(page => page.name === "aboutUs").length > 0){
+        firstList.push({id:4, name: lang.about_us, icon: <Group />, type: "aboutUs"})
+    }
+
+    if(home.site.navBar.pages.filter(page => page.name === "contactUs").length > 0){
+        firstList.push({id:5, name: lang.contact_us, icon: <ContactPhone />, type: "contactUs"})
+    }
 
     return(
         <div>
@@ -58,6 +69,8 @@ function SecondaryListItems(props){
                 switch (activeAction) {
                     case "nav-bar":
                         return <PagesSettingsList lang={lang} showPagesSettings={showPagesSettings}/>
+                    case "events":
+                        return <EventsSettingsList lang={lang} showPagesSettings={showPagesSettings}/>
                     case "post":
                         return <PostSettings lang={lang} showPagesSettings={showPagesSettings}/>
                     case "event":

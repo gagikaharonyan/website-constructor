@@ -11,13 +11,13 @@ import "antd/dist/antd.css";
 
 ReactDOM.render(
     <ProviderRedux store={store}>
-        <React.StrictMode>
-            <Router>
-                <ToastProvider>
+        <ToastProvider>
+            <React.StrictMode>
+                <Router>
                     <App/>
-                </ToastProvider>
-            </Router>
-        </React.StrictMode>
+                </Router>
+            </React.StrictMode>
+        </ToastProvider>
     </ProviderRedux>
     ,document.getElementById('root')
 );

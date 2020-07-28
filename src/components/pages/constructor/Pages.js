@@ -1,7 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import {connect, useSelector} from 'react-redux';
+import {change_nav_bar_data, change_page_data} from "../../../store/actions/homeAction";
 import { makeStyles } from '@material-ui/core/styles';
 import {Grid, Paper, Button} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
+import Loader from "react-loader-spinner";
+import {useToasts} from 'react-toast-notifications';
+import FirebaseFunctions from "../../../Firebase/FirebaseFunctions";
 import NavBar from "./pagesComponents/NavBar";
 import NavBarResult from "./pagesComponents/NavBarResult";
 import SettingsSection from "./pagesComponents/SettingsSection";
@@ -33,6 +38,13 @@ const useStyles = makeStyles((theme) => ({
     btnSave: {
         width: 300,
     },
+    loader: {
+        margin: '0 10px',
+        '& figure > div': {
+            verticalAlign: 'middle',
+            display: 'inline-block',
+        },
+    },
 }));
 
 const initPages = [
@@ -44,32 +56,91 @@ const initPages = [
 ];
 
 const initDefaultPages = [
-    {name: 'home', title: 'home', state: false},
-    {name: 'posts', title: 'posts', state: false},
-    {name: 'events', title: 'events', state: false},
+    {name: 'home'},
+    {name: 'posts'},
+    {name: 'events'},
 ];
 
-export default function Pages(props) {
+function Pages(props) {
     const classes = useStyles();
+    const {addToast} = useToasts();
+    const {home} = useSelector(state => state);
     const [pagesList, setPagesList] = useState([...initPages]);
     const [selectedPages, setSelectedPages] = useState([...initDefaultPages]);
+    const [_loader, setLoader] = useState(false);
     const {lang} = props;
+
+    useEffect(function () {
+        getNavBardData();
+    }, []);
+
+    const getNavBardData = () => {
+        FirebaseFunctions.getData("nav-bar")
+            .then(response => {
+                if (Object.keys(response).length > 0) {
+                    const pages = [...response.pages];
+                    setSelectedPages([...pages]);
+                    const updatePageState = initPages.map(item => {
+                        for (let i=0; i < pages.length; i++ ){
+                            if(pages[i]?.name === item?.name){
+                                return {...item, state: true};
+                            }
+                        }
+                        return item;
+                    });
+                    setPagesList([...updatePageState]);
+                    props.changeNavBarState({...response});
+                }
+            })
+            .catch(error => {
+                addToast(error.message, {
+                    appearance: 'error',
+                    autoDismiss: true,
+                })
+            });
+    }
 
     const addRemovePage = (state, name) => {
         const tempState = [...pagesList];
-        const tempPages = [...initDefaultPages];
+        const tempPages = [];
         tempState.map(item => {
             if(item.name === name){
                 item.state = !item.state;
-
             }
             if(item.state === true){
-                tempPages.push({name: item.title})
+                tempPages.push({name: item.name})
             }
             return item;
         })
         setPagesList([...tempState]);
         setSelectedPages([...tempPages]);
+
+        props.changeNavBarState({
+                ...home.site.navBar,
+                pages: [...tempPages],
+            }
+        );
+    }
+
+    const saveNavBarData = () => {
+        setLoader(true);
+        FirebaseFunctions.updateData("nav-bar", {...home.site.navBar})
+            .then(response => {
+                setLoader(false);
+                if(response.result){
+                    addToast(lang.data_updated_successfully, {
+                        appearance: 'success',
+                        autoDismiss: true,
+                    });
+                }
+            })
+            .catch(error => {
+                setLoader(false);
+                addToast(error.message, {
+                    appearance: 'error',
+                    autoDismiss: true,
+                });
+            });
     }
 
     return (
@@ -111,8 +182,13 @@ export default function Pages(props) {
                 </Grid>
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <Button variant="contained" color="primary" className={classes.btnSave}>
+                        <Button variant="contained" color="primary" className={classes.btnSave} disabled={_loader} onClick={() => saveNavBarData()}>
                             {lang.save_all_changes}
+                            {_loader ?
+                                <figure className={classes.loader}>
+                                    <Loader type="ThreeDots" color="#fff" height={15} width={40}/>
+                                </figure> : null
+                            }
                         </Button>
                     </Paper>
                 </Grid>
@@ -120,3 +196,18 @@ export default function Pages(props) {
         </div>
     );
 }
+
+const mapStateToProps = state => {
+    return {
+        ...state
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        changeHomeState: (data) => {dispatch(change_page_data(data))},
+        changeNavBarState: (data) => {dispatch(change_nav_bar_data(data))},
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(Pages)

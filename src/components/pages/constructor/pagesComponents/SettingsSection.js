@@ -7,6 +7,8 @@ import {AssignmentLate} from '@material-ui/icons';
 import BackgroundColor from "./settings/BackgroundColor";
 import TextColor from "./settings/TextColor";
 import FontFamily from "./settings/FontFamily";
+import SocialNetworks from "./settings/SocialNetworks";
+import SliderImages from "./settings/SliderImages";
 
 const useStyles = makeStyles(() => ({
     noSelected: {
@@ -44,6 +46,12 @@ function SettingsSection(props) {
         case "fontFamily":
             title = "font_family";
             break;
+        case "socialNetworks":
+            title = "social_networks";
+            break;
+        case "sliderImages":
+            title = "slider_images";
+            break;
         default:
             title = "settings";
     }
@@ -68,6 +76,10 @@ function SettingsSection(props) {
                             return <TextColor lang={lang}/>
                         case "fontFamily":
                             return <FontFamily lang={lang}/>
+                        case "socialNetworks":
+                            return <SocialNetworks lang={lang}/>
+                        case "sliderImages":
+                            return <SliderImages lang={lang}/>
                         default: return notSelected;
                     }
                 })()}

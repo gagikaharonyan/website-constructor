@@ -1,6 +1,6 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {connect, useSelector} from 'react-redux';
-import {change_page_data} from "../../../../../store/actions/homeAction";
+import {change_nav_bar_settings, change_page_data} from "../../../../../store/actions/homeAction";
 import {makeStyles} from '@material-ui/core/styles';
 import {Button, Radio, RadioGroup, FormControlLabel, FormControl} from '@material-ui/core';
 
@@ -29,23 +29,19 @@ function TextColor(props) {
     const [color, setColor] = useState("#ffffff");
     const {lang} = props;
 
+    useEffect(function () {
+        if(home.site.navBar.backgroundColor !== ""){
+            setColor(home.site.navBar.color);
+        }
+    },[]);
+
     const changeColor = (color) => {
         setColor(color)
     }
 
     const setNewColor = (ev) => {
         ev.preventDefault();
-        props.changeHomeState({
-                ...home,
-                site: {
-                    ...home.site,
-                    navBar: {
-                        ...home.site.navBar,
-                        color: color,
-                    }
-                }
-            }
-        );
+        props.changeNavBarSettings("color", color);
     }
 
     return (
@@ -85,6 +81,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
+        changeNavBarSettings: (name, data) => {dispatch(change_nav_bar_settings(name, data))},
     }
 }
 
