@@ -167,6 +167,48 @@ const deleteImageByName = (directory, name) => {
     });
 };
 
+
+/* Upload Image  */ /* (public) */
+const imageData = (data, directory) => {
+    return new Promise((resolve, reject) => {
+        let url = ""
+        if(data.file){
+            let storageRef = Firebase.storage.ref(`storage/images/${directory}`);
+            let uploadTask = storageRef.child(`/${data.name}`).put(data.file);
+            uploadTask.on('state_changed', function(snapshot){
+            }, function(error) {
+                reject({message:`Failed to upload image: ${error.message}`});
+            }, function() {
+                uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    if(downloadURL){
+                        resolve({name: data.name, url: downloadURL});
+                    }else{
+                        reject({message:`Failed to load image's URL: ${url}`});
+                    }
+                });
+            });
+        }
+    });
+};
+
+/* Upload multi image in from storage */ /* (public) */
+async function uploadMultiImage (data, directory) {
+    const images = [];
+    const length = data.length;
+    for(let i = 0; i < length; i++){
+        let image = await imageData(data[i], directory);
+        images.push(image);
+    }
+    return images;
+}
+
+const removeSelectedImages = (data, directory) => {
+    const length = data.length;
+    for(let i = 0; i < length; i++){
+        deleteImageByName(directory, data[i].name);
+    }
+};
+
 const FirebaseFunctions = {
     addNewData, // add new data in firebase db
     uploadImage, // upload image in firebase store
@@ -176,6 +218,8 @@ const FirebaseFunctions = {
     updateData, // update data in firebase db
     getData, // get data from firebase db
     deleteImageByName, // delete image by name from firebase store
+    uploadMultiImage, // upload multi image in from firebase store
+    removeSelectedImages, // remove images from firebase store
 };
 
 export default FirebaseFunctions;

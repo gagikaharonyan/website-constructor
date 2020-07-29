@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 import {connect, useSelector} from 'react-redux';
 import {change_page_data,add_update_networks_links,add_update_slider_image} from "../../../../../store/actions/homeAction";
+import {set_image,update_images_data} from "../../../../../store/actions/imagesAction";
+import {remove_image} from "../../../../../store/actions/removeImagesAction";
 import {useToasts} from "react-toast-notifications";
-import Loader from 'react-loader-spinner';
 import {makeStyles} from '@material-ui/core/styles';
 import {Button, Grid} from '@material-ui/core';
-import {PermMedia, PanoramaOutlined, InsertPhotoOutlined, Clear, WarningTwoTone} from "@material-ui/icons";
-import FirebaseFunctions from "../../../../../Firebase/FirebaseFunctions";
+import {PermMedia, PanoramaOutlined, InsertPhotoOutlined, Clear} from "@material-ui/icons";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -102,8 +102,7 @@ function SliderImages(props) {
     const classes = useStyles();
     const {addToast} = useToasts();
     const [imageData, setImageData] = useState({...initImageData});
-    const [_loader, setLoader] = useState(false);
-    const {home} = useSelector(state => state);
+    const {home, images} = useSelector(state => state);
     const {lang} = props;
     const slider = home.site.navBar.slider || [];
 
@@ -134,42 +133,22 @@ function SliderImages(props) {
     const deleteImage = (name) => {
         const sliderData = [...slider];
         const deleteImage = sliderData.filter(item => item.name !== name);
-        FirebaseFunctions.deleteImageByName("home", name)
-            .then(response => {
-                if (response.result) {
-                    props.addUpdateSliderImage([...deleteImage]);
-                }
-            })
-            .catch(error => {
-                addToast(error.message, {
-                    appearance: 'error',
-                    autoDismiss: true,
-                });
-            });
+        props.removeImage({name: name});
+        props.addUpdateSliderImage([...deleteImage]);
+    }
+
+    const deleteImageFromStore = (name) => {
+        const imagesData = [...images];
+        const deleteImage = imagesData.filter(item => item.name !== name);
+        props.updateImagesData([...deleteImage]);
     }
 
     const addImage = () => {
         if(imageData.file){
-            setLoader(true);
             let name = `${Date.now()}_${imageData.name}`;
-            FirebaseFunctions.uploadImage({...imageData, name}, 'home')
-                .then(response => {
-                    if (response.downloadURL !== "") {
-                        const sliderData = [...slider];
-                        let url = response.downloadURL;
-                        sliderData.push({url, name});
-                        props.addUpdateSliderImage([...sliderData]);
-                    }
-                    setLoader(false);
-                    setImageData({...initImageData});
-                })
-                .catch(error => {
-                    setLoader(false);
-                    addToast(error.message, {
-                        appearance: 'error',
-                        autoDismiss: true,
-                    });
-                });
+            const addData = {...imageData, name};
+            props.setNewImage(addData);
+            setImageData({...initImageData});
         }else {
             addToast(lang.error_empty_image, {
                 appearance: 'error',
@@ -210,11 +189,19 @@ function SliderImages(props) {
                                         null
                                     }
                                 </Grid>
+                                <Grid item xs={12}>
+                                    {imageData.selectedFile &&
+                                    <Button variant="contained" color="primary" type={"button"} className={`${classes.btn} ${classes.loader}`}
+                                        onClick={()=>addImage()}>
+                                        <InsertPhotoOutlined /> {lang.add}
+                                    </Button>
+                                    }
+                                </Grid>
                             </Grid>
                         </Grid>
                         <Grid item xs={12} className={classes.contactData}>
                             <h4 className={`${classes.h4}`}>
-                                <PermMedia />&nbsp;{lang.images} <span className={classes.warning}>(<WarningTwoTone /> {lang.warning_image})</span>
+                                <PermMedia />&nbsp;{lang.images}
                             </h4>
                             <hr/>
                             <div>
@@ -230,20 +217,19 @@ function SliderImages(props) {
                                         </div>
                                     ))
                                 }
+                                {images.length > 0 &&
+                                    images.map(item => (
+                                        <div className={`${classes.selectedImage} ${classes.delItem}`} key={item.name}>
+                                            <figure className={classes.selectedFile}>
+                                                <img src={item.selectedFile} alt="slide"/>
+                                            </figure>
+                                            <span onClick={() => deleteImageFromStore(item.name)}>
+                                                <Clear/>
+                                            </span>
+                                        </div>
+                                    ))
+                                }
                             </div>
-                        </Grid>
-                        <Grid item xs={12}>
-                            {imageData.selectedFile &&
-                                <Button variant="contained" color="primary" type={"button"} className={`${classes.btn} ${classes.loader}`}
-                                        disabled={_loader} onClick={()=>addImage()}>
-                                    <InsertPhotoOutlined /> {lang.add}
-                                    {_loader ?
-                                        <figure>
-                                            <Loader type="ThreeDots" color="#fff" height={15} width={40}/>
-                                        </figure> : null
-                                    }
-                                </Button>
-                            }
                         </Grid>
                     </Grid>
                 </div>
@@ -264,6 +250,9 @@ const mapDispatchToProps = dispatch => {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
         addUpdateNetworksLinks: (data) => {dispatch(add_update_networks_links(data))},
         addUpdateSliderImage: (data) => {dispatch(add_update_slider_image(data))},
+        setNewImage: (data) => {dispatch(set_image(data))},
+        updateImagesData: (data) => {dispatch(update_images_data(data))},
+        removeImage: (data) => {dispatch(remove_image(data))},
     }
 }
 

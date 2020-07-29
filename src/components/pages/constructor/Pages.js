@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {connect, useSelector} from 'react-redux';
 import {change_nav_bar_data, change_page_data} from "../../../store/actions/homeAction";
+import {update_images_data} from "../../../store/actions/imagesAction";
+import {set_remove_images} from "../../../store/actions/removeImagesAction";
 import { makeStyles } from '@material-ui/core/styles';
 import {Grid, Paper, Button} from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
@@ -48,23 +50,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initPages = [
-    {name: 'home', title: 'home', state: false},
-    {name: 'posts', title: 'posts', state: false},
-    {name: 'events', title: 'events', state: false},
-    {name: 'aboutUs', title: 'about_us', state: false},
-    {name: 'contactUs', title: 'contact_us', state: false},
+    {name: 'home', title: 'home', state: false, url: "/"},
+    {name: 'posts', title: 'posts', state: false, url: "/posts"},
+    {name: 'events', title: 'events', state: false, url: "events"},
+    {name: 'aboutUs', title: 'about_us', state: false, url: "about"},
+    {name: 'contactUs', title: 'contact_us', state: false, url: "contact-us"},
 ];
 
 const initDefaultPages = [
-    {name: 'home'},
-    {name: 'posts'},
-    {name: 'events'},
+    {name: 'home', url: "/"},
+    {name: 'posts', url: "/posts"},
+    {name: 'events', url: "events"},
 ];
 
 function Pages(props) {
     const classes = useStyles();
     const {addToast} = useToasts();
-    const {home} = useSelector(state => state);
+    const {home, images, removeImages} = useSelector(state => state);
     const [pagesList, setPagesList] = useState([...initPages]);
     const [selectedPages, setSelectedPages] = useState([...initDefaultPages]);
     const [_loader, setLoader] = useState(false);
@@ -108,7 +110,7 @@ function Pages(props) {
                 item.state = !item.state;
             }
             if(item.state === true){
-                tempPages.push({name: item.name})
+                tempPages.push({name: item.name, url: item.url})
             }
             return item;
         })
@@ -124,7 +126,40 @@ function Pages(props) {
 
     const saveNavBarData = () => {
         setLoader(true);
-        FirebaseFunctions.updateData("nav-bar", {...home.site.navBar})
+        if(images.length > 0) {
+            FirebaseFunctions.uploadMultiImage(images, "home")
+                .then(response => {
+                    setLoader(false);
+                    if (response.length > 0) {
+                        const navBar = {...home.site.navBar};
+                        if (navBar.slider) {
+                            navBar.slider = [...navBar.slider, ...response];
+                        } else {
+                            navBar.slider = [...response];
+                        }
+                        saveData({...navBar});
+                        props.updateImagesData([]);
+                        props.changeNavBarState({...navBar});
+                    }
+                })
+                .catch(error => {
+                    setLoader(false);
+                    addToast(error.message, {
+                        appearance: 'error',
+                        autoDismiss: true,
+                    });
+                });
+        }else{
+            saveData({...home.site.navBar});
+        }
+        if(removeImages.length > 0){
+            FirebaseFunctions.removeSelectedImages(removeImages, "home");
+            props.setRemoveImages([]);
+        }
+    }
+
+    const saveData = (data) => {
+        FirebaseFunctions.updateData("nav-bar", {...data})
             .then(response => {
                 setLoader(false);
                 if(response.result){
@@ -207,6 +242,8 @@ const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
         changeNavBarState: (data) => {dispatch(change_nav_bar_data(data))},
+        updateImagesData: (data) => {dispatch(update_images_data(data))},
+        setRemoveImages: (data) => {dispatch(set_remove_images(data))},
     }
 }
 
