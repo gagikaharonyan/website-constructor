@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {connect, useSelector} from 'react-redux';
 import {change_events_state, change_page_data} from "../../../../store/actions/homeAction";
+import {set_image, update_images_data} from "../../../../store/actions/imagesAction";
+import {remove_image, set_remove_images} from "../../../../store/actions/removeImagesAction";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {useToasts} from 'react-toast-notifications';
@@ -8,7 +10,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
 import Loader from 'react-loader-spinner';
 import {Paper, Grid, TextField, Button} from '@material-ui/core';
-import {Clear, InsertPhotoOutlined, PanoramaOutlined, PermMedia, Save, WarningTwoTone} from '@material-ui/icons';
+import {Clear, InsertPhotoOutlined, PanoramaOutlined, PermMedia, Save} from '@material-ui/icons';
 import FirebaseFunctions from '../../../../Firebase/FirebaseFunctions';
 import { v1 as uuidv1 } from 'uuid';
 
@@ -195,7 +197,7 @@ const getDate = (data) => {
 function Event(props) {
     const classes = useStyles();
     const {addToast} = useToasts();
-    const {home} = useSelector(state => state);
+    const {home, images, removeImages} = useSelector(state => state);
     const [newEvent, setNewEvent] = useState({...initEvent});
     const [imageData, setImageData] = useState({...initImageData});
     const [noValid, setNoValid] = useState(initValidation);
@@ -260,28 +262,10 @@ function Event(props) {
 
     const addImage = () => {
         if(imageData.file){
-            setLoader(true);
             let name = `${Date.now()}_${imageData.name}`;
-            FirebaseFunctions.uploadImage({...imageData, name}, "events")
-                .then(response => {
-                    if (response.downloadURL !== "") {
-                        const imagesData = [...newEvent.images];
-                        let url = response.downloadURL;
-                        imagesData.push({url, name});
-                        setNewEvent(prevState=>{
-                            return {...prevState, images: [...imagesData]}
-                        });
-                    }
-                    setLoader(false);
-                    setImageData({...initImageData});
-                })
-                .catch(error => {
-                    setLoader(false);
-                    addToast(error.message, {
-                        appearance: 'error',
-                        autoDismiss: true,
-                    });
-                });
+            const addData = {...imageData, name};
+            props.setNewImage(addData);
+            setImageData({...initImageData});
         }else {
             addToast(lang.error_empty_image, {
                 appearance: 'error',
@@ -293,20 +277,14 @@ function Event(props) {
     const deleteImage = (name) => {
         const imagesData = [...newEvent.images];
         const deleteImage = imagesData.filter(item => item.name !== name);
-        FirebaseFunctions.deleteImageByName("events", name)
-            .then(response => {
-                if (response.result) {
-                    setNewEvent(prevState=>{
-                        return {...prevState, images: [...deleteImage]}
-                    });
-                }
-            })
-            .catch(error => {
-                addToast(error.message, {
-                    appearance: 'error',
-                    autoDismiss: true,
-                });
-            });
+        props.removeImage({name: name});
+        setNewEvent({...newEvent, images: [...deleteImage]});
+    }
+
+    const deleteImageFromStore = (name) => {
+        const imagesData = [...images];
+        const deleteImage = imagesData.filter(item => item.name !== name);
+        props.updateImagesData([...deleteImage]);
     }
 
     const handleChangeDetails = (event, editor) => {
@@ -336,7 +314,30 @@ function Event(props) {
                 date: newEvent.date === "" ? getDate() : newEvent.date,
             };
             setLoader(true);
-            update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
+            if(images.length > 0) {
+                FirebaseFunctions.uploadMultiImage(images, "events")
+                    .then(response => {
+                        setLoader(false);
+                        if (response.length > 0) {
+                            if (newEventData.images && newEventData.images.length > 0) {
+                                newEventData.images = [...newEventData.images, ...response];
+                            } else {
+                                newEventData.images = [...response];
+                            }
+                            props.updateImagesData([]);
+                            update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
+                        }
+                    })
+                    .catch(error => {
+                        setLoader(false);
+                        addToast(error.message, {
+                            appearance: 'error',
+                            autoDismiss: true,
+                        });
+                    });
+            }else {
+                update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
+            }
         }
     }
 
@@ -375,6 +376,7 @@ function Event(props) {
                     });
                     const tempEvents = Object.assign({}, {...home.site.events, [id]: {...data}});
                     props.changeEventsState({...tempEvents});
+                    setNewEvent({...data});
                 }
             })
             .catch(error => {
@@ -384,7 +386,23 @@ function Event(props) {
                     autoDismiss: true,
                 });
             });
+        if(removeImages.length > 0){
+            FirebaseFunctions.removeSelectedImages(removeImages, "events");
+            props.setRemoveImages([]);
+        }
     }
+
+    const storeImagesJSX = images.length > 0 ? images.map(item => (
+            <div className={`${classes.selectedImage} ${classes.delItem}`}
+                 key={item.name}>
+                <figure className={classes.selectedFile}>
+                    <img src={item.selectedFile} alt="slide"/>
+                </figure>
+                <span onClick={() => deleteImageFromStore(item.name)}>
+                    <Clear/>
+                </span>
+            </div>
+        )) : null;
 
     return (
         <div className={classes.root}>
@@ -484,7 +502,7 @@ function Event(props) {
                                 { newEvent.images.length > 0 ?
                                     <Grid item xs={12}>
                                         <h4 className={`${classes.h1} ${classes.h4}`}>
-                                            <PermMedia />&nbsp;{lang.images} <span className={classes.warning}>(<WarningTwoTone /> {lang.warning_image})</span>
+                                            <PermMedia />&nbsp;{lang.images}
                                         </h4>
                                         <hr/>
                                         <div>
@@ -500,15 +518,27 @@ function Event(props) {
                                                 </div>
                                             ))
                                             }
+                                            {images.length > 0 && storeImagesJSX}
                                         </div>
                                     </Grid> :
-                                    <Grid item xs={12}>
-                                        <div className={classes.image}>
-                                            <figure className={"selected-file"}>
-                                                <img src={"/images/upcoming-event.jpg"} alt="event"/>
-                                            </figure>
-                                        </div>
-                                    </Grid>
+                                        images.length > 0 ?
+                                            <Grid item xs={12}>
+                                                <h4 className={`${classes.h1} ${classes.h4}`}>
+                                                    <PermMedia />&nbsp;{lang.images}
+                                                </h4>
+                                                <hr/>
+                                                <div>
+                                                    {storeImagesJSX}
+                                                </div>
+                                            </Grid>
+                                        :
+                                        <Grid item xs={12}>
+                                            <div className={classes.image}>
+                                                <figure className={"selected-file"}>
+                                                    <img src={"/images/upcoming-event.jpg"} alt="event"/>
+                                                </figure>
+                                            </div>
+                                        </Grid>
                                 }
                                 {noValid.error ?
                                     <Grid item xs={12}>
@@ -548,6 +578,10 @@ const mapDispatchToProps = dispatch => {
     return {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
         changeEventsState: (data) => {dispatch(change_events_state(data))},
+        setNewImage: (data) => {dispatch(set_image(data))},
+        updateImagesData: (data) => {dispatch(update_images_data(data))},
+        setRemoveImages: (data) => {dispatch(set_remove_images(data))},
+        removeImage: (data) => {dispatch(remove_image(data))},
     }
 }
 
