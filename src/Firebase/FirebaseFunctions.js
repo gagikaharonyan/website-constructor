@@ -60,19 +60,19 @@ const getEvents = () => {
 };
 
 /* Delete Events Data */ /* (public) */
-const deleteEventById = (id, image) => {
+const deleteEventById = (id, images) => {
     return new Promise(function(resolve, reject) {
-        if(image !== ""){
-            deleteImage(image).then((response) => {
-                if(response === true){
-                    deleteEvent(id).then(function() {
-                        resolve({result: true});
-                    }).catch(error => {
-                        reject({message: `Database error. 'Event' data! ${error.message}`});
-                    });
-                }
+        const length = images.length;
+        if(length && length !== 0){
+            for (let i=0; i< length;i++){
+                deleteImage(images[i].name).catch(error => {
+                    reject({message: `Database error. 'Event Image' data! ${error.message}`});
+                });
+            }
+            deleteEvent(id).then(function() {
+                resolve({result: true});
             }).catch(error => {
-                reject({message: `Database error. 'Event Image' data! ${error.message}`});
+                reject({message: `Database error. 'Event' data! ${error.message}`});
             });
         }else{
             deleteEvent(id).then(function() {

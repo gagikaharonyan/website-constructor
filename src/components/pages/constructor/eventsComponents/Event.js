@@ -6,14 +6,9 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {useToasts} from 'react-toast-notifications';
 import {makeStyles} from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
-import DateFnsUtils from '@date-io/date-fns';
 import Loader from 'react-loader-spinner';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
 import {Paper, Grid, TextField, Button} from '@material-ui/core';
-import {PanoramaOutlined} from '@material-ui/icons';
+import {Clear, InsertPhotoOutlined, PanoramaOutlined, PermMedia, Save, WarningTwoTone} from '@material-ui/icons';
 import FirebaseFunctions from '../../../../Firebase/FirebaseFunctions';
 import { v1 as uuidv1 } from 'uuid';
 
@@ -44,6 +39,15 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 30,
         textShadow: '0px 4px 3px rgba(0,0,0,0.4), 0px 3px 6px rgba(0, 0, 0, 0.25), 0px 18px 23px rgba(0,0,0,0.1);',
     },
+    h4: {
+        display: "flex",
+        fontSize: 17,
+    },
+    imageContent: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     fileBtn: {
         height: '56px',
         width: '25ch',
@@ -57,6 +61,18 @@ const useStyles = makeStyles((theme) => ({
     },
     fileInput: {
         display: 'none'
+    },
+    selectedImage: {
+        display: 'inline',
+        '& div': {
+            display: 'inline-block',
+        },
+    },
+    selectedFile: {
+        display: 'inline',
+        '& img': {
+            width: 150,
+        },
     },
     image: {
         '& img': {
@@ -75,26 +91,61 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     loader: {
-        margin: '0 10px',
-        '& figure > div': {
-            verticalAlign: 'middle',
-            display: 'inline-block',
+        '& figure': {
+            margin: '0 10px',
+            '& > div': {
+                display: 'flex',
+            },
         },
-    }
+    },
+    textField: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: '235px!important',
+    },
+    delItem: {
+        position: "relative",
+        marginLeft: 30,
+        '& span svg': {
+            position: 'absolute',
+            fontSize: 15,
+            color: 'black',
+        },
+        '& span:hover svg': {
+            color: 'red',
+            cursor: 'pointer',
+        },
+        '& figure': {
+            marginRight: 10,
+        },
+    },
+    warning: {
+        textShadow: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        fontSize: 12,
+        marginLeft: 10,
+        color: '#f38207',
+        '& svg': {
+            fontSize: 17,
+            marginRight: 3,
+        },
+    },
 }));
 
 const initEvent = {
     id: '',
     title: '',
-    imageUrl: '',
-    imageName: '',
-    imageData: {
-        selectedFile: null,
-        file: null,
-        name: null,
-    },
+    images: [],
     details: '',
     date: '',
+    location: '',
+};
+
+const initImageData = {
+    selectedFile: null,
+    file: null,
+    name: null,
 };
 
 const initValidation = {
@@ -116,27 +167,47 @@ const months = {
     11: 'December'
 };
 
+const addZero = i => i < 10 ? `0${i}` : i;
+
+const convertDate = (data) => {
+    /* Format to /yyyy-mm-dd T hh:mm/ */
+    let d = data ? new Date(data) : new Date();
+    const year = d.getFullYear();
+    const date = addZero(d.getDate());
+    const month = addZero(d.getMonth() + 1);
+    const hours = addZero(d.getHours());
+    const minutes = addZero(d.getMinutes());
+    return `${year}-${month}-${date}T${hours}:${minutes}`;
+}
+
+const getDate = (data) => {
+    /* Format to /day month year at hours:minutes/ */
+    let d = data ? new Date(data) : new Date();
+    const year = d.getFullYear();
+    const date = addZero(d.getDate());
+    const monthIndex = d.getMonth();
+    const monthName = months[monthIndex];
+    const hours = addZero(d.getHours());
+    const minutes = addZero(d.getMinutes());
+    return `${date} ${monthName} ${year} at ${hours}:${minutes}`;
+}
+
 function Event(props) {
     const classes = useStyles();
     const {addToast} = useToasts();
     const {home} = useSelector(state => state);
     const [newEvent, setNewEvent] = useState({...initEvent});
+    const [imageData, setImageData] = useState({...initImageData});
     const [noValid, setNoValid] = useState(initValidation);
     const [_loader, setLoader] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(convertDate(new Date()));
     const {lang, editEventData} = props;
 
     useEffect(function () {
         if (Object.keys(editEventData).length > 0 && editEventData.id) {
-            setNewEvent({
-                ...editEventData,
-                imageData: {
-                    selectedFile: null,
-                    file: null,
-                    name: null,
-                }
-            });
-            setSelectedDate(new Date(editEventData.date));
+            setNewEvent({...editEventData});
+            setImageData({...initImageData});
+            setSelectedDate(convertDate(editEventData.cleanDate));
         }
         if(home.currentSetting === "newEvent"){
             setNewEvent({...initEvent});
@@ -153,22 +224,14 @@ function Event(props) {
         setNoValid({error: false});
     }
 
-    const handleChangeDate = (data) => {
-        const formatted = getDate(data);
-        setSelectedDate(data);
+    const handleChangeDate = (ev) => {
+        let value = ev.target.value;
+        const formatted = getDate(value);
+        setSelectedDate(value);
         setNewEvent(prevState => {
             return {...prevState, date: formatted};
         });
         setNoValid({error: false});
-    }
-
-    const getDate = (data) => {
-        let d = data ? new Date(data) : new Date();
-        const year = d.getFullYear();
-        const date = d.getDate();
-        const monthIndex = d.getMonth();
-        const monthName = months[monthIndex];
-        return `${date} ${monthName} ${year}`;
     }
 
     const setImage = (e) => {
@@ -179,13 +242,11 @@ function Event(props) {
                 file.type === "image/jpg" || file.type === "image/gif")){
             reader.readAsDataURL(file)
             reader.onloadend = () => {
-                setNewEvent(newEvent => {
+                setImageData(() => {
                     return {
-                        ...newEvent, imageData: {
-                            selectedFile: reader.result,
-                            name: file.name,
-                            file
-                        },
+                        selectedFile: reader.result,
+                        name: file.name,
+                        file
                     }
                 });
             }
@@ -195,6 +256,57 @@ function Event(props) {
                 autoDismiss: true
             });
         }
+    }
+
+    const addImage = () => {
+        if(imageData.file){
+            setLoader(true);
+            let name = `${Date.now()}_${imageData.name}`;
+            FirebaseFunctions.uploadImage({...imageData, name}, "events")
+                .then(response => {
+                    if (response.downloadURL !== "") {
+                        const imagesData = [...newEvent.images];
+                        let url = response.downloadURL;
+                        imagesData.push({url, name});
+                        setNewEvent(prevState=>{
+                            return {...prevState, images: [...imagesData]}
+                        });
+                    }
+                    setLoader(false);
+                    setImageData({...initImageData});
+                })
+                .catch(error => {
+                    setLoader(false);
+                    addToast(error.message, {
+                        appearance: 'error',
+                        autoDismiss: true,
+                    });
+                });
+        }else {
+            addToast(lang.error_empty_image, {
+                appearance: 'error',
+                autoDismiss: true,
+            });
+        }
+    }
+
+    const deleteImage = (name) => {
+        const imagesData = [...newEvent.images];
+        const deleteImage = imagesData.filter(item => item.name !== name);
+        FirebaseFunctions.deleteImageByName("events", name)
+            .then(response => {
+                if (response.result) {
+                    setNewEvent(prevState=>{
+                        return {...prevState, images: [...deleteImage]}
+                    });
+                }
+            })
+            .catch(error => {
+                addToast(error.message, {
+                    appearance: 'error',
+                    autoDismiss: true,
+                });
+            });
     }
 
     const handleChangeDetails = (event, editor) => {
@@ -217,34 +329,14 @@ function Event(props) {
             const newEventData = {
                 id: id,
                 title: newEvent.title,
-                imageUrl: newEvent.imageUrl,
-                imageName: newEvent.imageName,
+                images: [...newEvent.images],
                 details: newEvent.details,
+                location: newEvent.location,
+                cleanDate: selectedDate,
                 date: newEvent.date === "" ? getDate() : newEvent.date,
             };
-
-            if(newEvent.imageData.file){
-                setLoader(true);
-                let name = `${Date.now()}_${newEvent.imageData.name}`;
-                FirebaseFunctions.uploadImage({...newEvent.imageData, name}, 'events', newEvent.imageName)
-                    .then(response => {
-                        if (response.downloadURL !== "") {
-                            newEventData.imageUrl = response.downloadURL;
-                            newEventData.imageName = name;
-                            update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
-                        }
-                    })
-                    .catch(error => {
-                        setLoader(false);
-                        addToast(error.message, {
-                            appearance: 'error',
-                            autoDismiss: true,
-                        })
-                    });
-            }else {
-                setLoader(true);
-                update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
-            }
+            setLoader(true);
+            update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
         }
     }
 
@@ -260,7 +352,7 @@ function Event(props) {
                     const tempEvents = Object.assign({}, {...home.site.events, [id]: {...data}});
                     props.changeEventsState({...tempEvents});
                     setNewEvent({...initEvent});
-                    setSelectedDate(new Date());
+                    setSelectedDate(convertDate(new Date()));
                 }
             })
             .catch(error => {
@@ -313,33 +405,62 @@ function Event(props) {
                                         value={newEvent.title}
                                         onChange={(ev) => handleChange(ev)}
                                     />
-                                    <Button variant="outlined" component="label" className={classes.fileBtn}>
-                                        <PanoramaOutlined htmlColor={"#797979"}/>&nbsp;
-                                        {lang.select_image}
-                                        <input
-                                            type="file"
-                                            name={"eventImg"}
-                                            className={classes.fileInput}
-                                            onChange={(e) => setImage(e)}
-                                        />
-                                    </Button>
-                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                        <KeyboardDatePicker
-                                            required
-                                            fullWidth
-                                            variant="outlined"
-                                            margin="normal"
-                                            id="date-picker-dialog"
-                                            label={lang.date}
-                                            format="MM/dd/yyyy"
-                                            name={"date"}
-                                            value={selectedDate}
-                                            KeyboardButtonProps={{
-                                                'aria-label': 'change date',
-                                            }}
-                                            onChange={(ev) => handleChangeDate(ev)}
-                                        />
-                                    </MuiPickersUtilsProvider>
+                                    <TextField
+                                        required
+                                        name={"location"}
+                                        label={lang.location_}
+                                        variant="outlined"
+                                        value={newEvent.location}
+                                        onChange={(ev) => handleChange(ev)}
+                                    />
+                                    <TextField
+                                        id="datetime-local"
+                                        label={lang.date}
+                                        type="datetime-local"
+                                        value={selectedDate}
+                                        className={classes.textField}
+                                        name={"date"}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        onChange={(ev) => handleChangeDate(ev)}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Grid container spacing={3}>
+                                        <Grid item sm={12} md={6} className={classes.imageContent}>
+                                            <Button variant="outlined" component="label" className={classes.fileBtn}>
+                                                <PanoramaOutlined htmlColor={"#797979"}/>&nbsp;
+                                                {lang.select_image}
+                                                <input
+                                                    type="file"
+                                                    name={"techImg"}
+                                                    className={classes.fileInput}
+                                                    onChange={(e)=>setImage(e)}
+                                                />
+                                            </Button>
+                                            <Button variant="contained" color="primary" type={"button"} className={`${classes.btn} ${classes.loader}`}
+                                                disabled={_loader || !imageData.selectedFile} onClick={()=>addImage()}>
+                                                <InsertPhotoOutlined /> {lang.add}
+                                                {_loader ?
+                                                    <figure>
+                                                        <Loader type="ThreeDots" color="#fff" height={15} width={40}/>
+                                                    </figure> : null
+                                                }
+                                            </Button>
+                                        </Grid>
+                                        <Grid item sm={12} md={6}>
+                                            {imageData.selectedFile ?
+                                                <div className={classes.selectedImage}>
+                                                    <figure className={classes.selectedFile}>
+                                                        <img src={imageData.selectedFile} alt="slide"/>
+                                                    </figure>
+                                                </div>
+                                                :
+                                                null
+                                            }
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Grid container spacing={3} className={classes.editorContainer}>
@@ -360,23 +481,34 @@ function Event(props) {
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                                {newEvent.imageData.selectedFile ?
+                                { newEvent.images.length > 0 ?
+                                    <Grid item xs={12}>
+                                        <h4 className={`${classes.h1} ${classes.h4}`}>
+                                            <PermMedia />&nbsp;{lang.images} <span className={classes.warning}>(<WarningTwoTone /> {lang.warning_image})</span>
+                                        </h4>
+                                        <hr/>
+                                        <div>
+                                            {newEvent.images.map(item => (
+                                                <div className={`${classes.selectedImage} ${classes.delItem}`}
+                                                     key={item.name}>
+                                                    <figure className={classes.selectedFile}>
+                                                        <img src={item.url} alt="slide"/>
+                                                    </figure>
+                                                    <span onClick={() => deleteImage(item.name)}>
+                                                        <Clear/>
+                                                    </span>
+                                                </div>
+                                            ))
+                                            }
+                                        </div>
+                                    </Grid> :
                                     <Grid item xs={12}>
                                         <div className={classes.image}>
                                             <figure className={"selected-file"}>
-                                                <img src={newEvent.imageData.selectedFile} alt="event"/>
+                                                <img src={"/images/upcoming-event.jpg"} alt="event"/>
                                             </figure>
                                         </div>
                                     </Grid>
-                                    :
-                                    newEvent.imageUrl !== "" ?
-                                        <Grid item xs={12}>
-                                            <div className={classes.image}>
-                                                <figure className={"selected-file"}>
-                                                    <img src={newEvent.imageUrl} alt="event"/>
-                                                </figure>
-                                            </div>
-                                        </Grid> : null
                                 }
                                 {noValid.error ?
                                     <Grid item xs={12}>
@@ -387,7 +519,8 @@ function Event(props) {
                                     : null
                                 }
                                 <Grid item xs={12}>
-                                    <Button variant="contained" color="primary" type={"submit"} disabled={_loader}>
+                                    <Button variant="contained" color="primary" type={"submit"} disabled={_loader} className={classes.loader}>
+                                        <Save />&nbsp;
                                         {newEvent.id ? lang.update : lang.save}
                                         {_loader ?
                                             <figure className={classes.loader}>
