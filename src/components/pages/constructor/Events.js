@@ -22,6 +22,7 @@ function Events(props) {
         }else {
             getEventsData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [home.currentSetting])
 
     const editEvent = (id) => {

@@ -33,6 +33,7 @@ function FontFamily(props) {
         if(home.site.navBar.backgroundColor !== ""){
             setFont(home.site.navBar.fontFamily);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
 
     const changeFont = (type) => {

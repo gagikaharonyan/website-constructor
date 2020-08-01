@@ -141,6 +141,7 @@ function Event(props) {
         if(home.currentSetting === "newEvent"){
             setNewEvent({...initEvent});
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[editEventData]);
 
     const handleChange = (ev) => {

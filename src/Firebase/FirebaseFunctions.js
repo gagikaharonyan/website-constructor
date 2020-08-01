@@ -95,6 +95,22 @@ const deleteEvent = (id) => {
     });
 };
 
+/* Get Category Data */
+const getCategories = () => {
+    return new Promise(function (resolve, reject) {
+        Firebase.getCategories().once('value').then(function (snapshot) {
+            let categoriesData = snapshot.val();
+            if (categoriesData && Object.keys(categoriesData).length !== 0 && categoriesData.constructor === Object) {
+                resolve(Object.values(categoriesData));
+            } else if (categoriesData == null) {
+                reject({message: 'Database error. Empty `Categories` data!'});
+            }
+        }).catch(error => {
+            reject({message: `Database error. 'Categories' data! ${error.message}`});
+        });
+    });
+};
+
 /* Deleting images from storage */ /* (static) */
 const deleteImage = (data) => {
     return new Promise(function(resolve, reject) {
@@ -171,6 +187,7 @@ const FirebaseFunctions = {
     addNewData, // add new data in firebase db
     uploadImage, // upload image in firebase store
     getEvents, // get all events data from firebase db
+    getCategories, // get all Category data from firebase db
     deleteEventById, // delete event by id from firebase db
     updateDataById, // update data by id in firebase db
     updateData, // update data in firebase db

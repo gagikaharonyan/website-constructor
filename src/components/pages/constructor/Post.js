@@ -53,9 +53,9 @@ const useStyles = makeStyles((theme) => ({
 
 function Post(props) {
     const [isLoadingBtnSave, setIsLoadingBtnSave] = useState(false),
-        classes = useStyles(),
-        {lang} = props,
-        {home} = useSelector(state => state);
+          classes = useStyles(),
+          {lang} = props,
+          {home} = useSelector(state => state);
 
     const validationAdvancedSettings = (post) => {
         let isValid = true;

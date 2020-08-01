@@ -8,7 +8,9 @@ import {
     ADD_CONTACT_DATA,
     ADD_UPDATE_NETWORKS_LINKS,
     ADD_UPDATE_SLIDER_IMAGE,
-    GET_DATA_POSTS
+    GET_DATA_POSTS,
+    GET_CATEGORIES,
+    LOADING_CATEGORIES
 } from '../constants';
 
 const initState = {
@@ -42,6 +44,10 @@ const initState = {
         },
         contactUs: [],
         events: {},
+        categories: {
+            data: [],
+            isLoading: false
+        }
     },
 };
 
@@ -122,6 +128,26 @@ const homeReducer = (state= initState,{type,payload}) => {
                             allList: [...payload],
                             loading: false,
                         }
+                    }
+                }
+            }
+        case GET_CATEGORIES:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    categories: {
+                        ...state.site.categories,
+                        data: [...payload]
+                    }
+                }
+            }
+        case LOADING_CATEGORIES:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    categories: {
+                        ...state.site.categories,
+                        isLoading: payload
                     }
                 }
             }
