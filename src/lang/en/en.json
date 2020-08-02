@@ -119,5 +119,15 @@
   "error_empty_value": "You cannot add an empty value!",
   "error_empty_image": "You have not selected an image to add!",
   "warning_image": "After deleting images the image file is deleted from the storage location, but the link remains in the database, to avoid errors don't forget to save all changes after deleting the image!",
-  "location_": "Location"
+  "location_": "Location",
+  "slide": "Slide",
+  "select_slide_image": "Select slide image",
+  "select_cover": "Select cover",
+  "error_cover": "Cover image is required!",
+  "change": "Change",
+  "error_date": "Date and time required field!",
+  "heading": "Heading",
+  "address": "Address",
+  "map_link": "Map link",
+  "map_iframe": "Map iframe"
 }

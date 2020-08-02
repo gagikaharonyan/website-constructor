@@ -3,6 +3,7 @@ import {connect, useSelector} from 'react-redux';
 import {change_events_state, change_page_data} from "../../../../store/actions/homeAction";
 import {set_image, update_images_data} from "../../../../store/actions/imagesAction";
 import {remove_image, set_remove_images} from "../../../../store/actions/removeImagesAction";
+import {set_cover_image, reset_cover_data} from "../../../../store/actions/coverAction";
 import CKEditor from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {useToasts} from 'react-toast-notifications';
@@ -44,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
     h4: {
         display: "flex",
         fontSize: 17,
+        fontWeight: 600,
     },
     imageContent: {
         display: 'flex',
@@ -52,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     },
     fileBtn: {
         height: '56px',
-        width: '25ch',
+        width: '28ch',
         color: '#757575',
         fontSize: 15,
         margin: 8,
@@ -89,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
         '& h3': {
             color: '#000',
             fontSize: 18,
-            textShadow: '0px 4px 3px rgba(0,0,0,0.4), 0px 3px 6px rgba(0, 0, 0, 0.25), 0px 18px 23px rgba(0,0,0,0.1);',
+            fontWeight: 600,
         },
     },
     loader: {
@@ -133,15 +135,25 @@ const useStyles = makeStyles((theme) => ({
             marginRight: 3,
         },
     },
+    inputEv: {
+        '& > div.input-ev':{
+            width: '400px',
+        },
+    },
 }));
 
 const initEvent = {
     id: '',
-    title: '',
-    images: [],
+    heading: '',
+    slide: [],
     details: '',
     date: '',
-    location: '',
+    dateBySeconds: '',
+    location: {
+        address: '',
+        mapLink: '',
+        mapIframe: '',
+    },
 };
 
 const initImageData = {
@@ -152,6 +164,7 @@ const initImageData = {
 
 const initValidation = {
     error: false,
+    text: '',
 };
 
 const months = {
@@ -197,8 +210,9 @@ const getDate = (data) => {
 function Event(props) {
     const classes = useStyles();
     const {addToast} = useToasts();
-    const {home, images, removeImages} = useSelector(state => state);
+    const {home, cover, images, removeImages} = useSelector(state => state);
     const [newEvent, setNewEvent] = useState({...initEvent});
+    const [coverData, setCoverData] = useState({...initImageData});
     const [imageData, setImageData] = useState({...initImageData});
     const [noValid, setNoValid] = useState(initValidation);
     const [_loader, setLoader] = useState(false);
@@ -213,6 +227,7 @@ function Event(props) {
         }
         if(home.currentSetting === "newEvent"){
             setNewEvent({...initEvent});
+            setSelectedDate(convertDate(new Date()));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[editEventData]);
@@ -221,9 +236,18 @@ function Event(props) {
         ev.preventDefault();
         let value = ev.target.value;
         let name = ev.target.name;
-        setNewEvent(prevState=>{
-            return {...prevState, [name]: value}
-        });
+        if(name === "address" || name === "mapLink" || name === "mapIframe"){
+            setNewEvent(prevState => {
+                return {...prevState, location: {
+                    ...prevState.location,
+                    [name]: value,
+                }}
+            });
+        }else {
+            setNewEvent(prevState=>{
+                return {...prevState, [name]: value}
+            });
+        }
         setNoValid({error: false});
     }
 
@@ -232,12 +256,12 @@ function Event(props) {
         const formatted = getDate(value);
         setSelectedDate(value);
         setNewEvent(prevState => {
-            return {...prevState, date: formatted};
+            return {...prevState, date: formatted, dateBySeconds: value};
         });
         setNoValid({error: false});
     }
 
-    const setImage = (e) => {
+    const setImage = (e, type) => {
         let file = e.target.files[0]
         const reader = new FileReader()
         if(file !== undefined &&
@@ -245,13 +269,23 @@ function Event(props) {
                 file.type === "image/jpg" || file.type === "image/gif")){
             reader.readAsDataURL(file)
             reader.onloadend = () => {
-                setImageData(() => {
-                    return {
-                        selectedFile: reader.result,
-                        name: file.name,
-                        file
-                    }
-                });
+                if(type === "cover"){
+                    setCoverData(() => {
+                        return {
+                            selectedFile: reader.result,
+                            name: file.name,
+                            file
+                        }
+                    });
+                }else{
+                    setImageData(() => {
+                        return {
+                            selectedFile: reader.result,
+                            name: file.name,
+                            file
+                        }
+                    });
+                }
             }
         }else if(file !== undefined){
             addToast(lang.image_warning, {
@@ -261,8 +295,16 @@ function Event(props) {
         }
     }
 
-    const addImage = () => {
-        if(imageData.file){
+    const addImage = (type) => {
+        if(coverData.file && type === "cover"){
+            if(newEvent.cover && newEvent.cover.name){
+                props.removeImage({name: newEvent.cover.name});
+            }
+            let name = `${Date.now()}_${coverData.name}`;
+            const addData = {...coverData, name};
+            props.setCoverImage(addData);
+            setNoValid({error: false, text: ""});
+        }else if(imageData.file && type === "slide"){
             let name = `${Date.now()}_${imageData.name}`;
             const addData = {...imageData, name};
             props.setNewImage(addData);
@@ -276,10 +318,10 @@ function Event(props) {
     }
 
     const deleteImage = (name) => {
-        const imagesData = [...newEvent.images];
+        const imagesData = [...newEvent.slide];
         const deleteImage = imagesData.filter(item => item.name !== name);
         props.removeImage({name: name});
-        setNewEvent({...newEvent, images: [...deleteImage]});
+        setNewEvent({...newEvent, slide: [...deleteImage]});
     }
 
     const deleteImageFromStore = (name) => {
@@ -300,45 +342,73 @@ function Event(props) {
 
     const saveEventData = (ev) => {
         ev.preventDefault();
-        if(newEvent.title === "" || newEvent.details === ""){
-            setNoValid({error: true});
+        if(newEvent.heading === "" || newEvent.details === ""){
+            setNoValid({error: true, text:  lang.error_event_required_fields});
+        }else if(Object.keys(cover).length === 0 && !newEvent?.cover && !newEvent?.cover?.name){
+            setNoValid({error: true, text:  lang.error_cover});
+        }else if(newEvent.date === ""){
+            setNoValid({error: true, text:  lang.error_date});
         }else{
             let update = !!newEvent.id;
             let id = newEvent.id !== "" ? newEvent.id : uuidv1();
             const newEventData = {
                 id: id,
-                title: newEvent.title,
-                images: [...newEvent.images],
+                heading: newEvent.heading,
+                cover: {...newEvent.cover},
+                slide: newEvent.slide ? [...newEvent.slide] : [],
                 details: newEvent.details,
                 location: newEvent.location,
                 cleanDate: selectedDate,
                 date: newEvent.date === "" ? getDate() : newEvent.date,
+                dateBySeconds: newEvent.dateBySeconds,
             };
             setLoader(true);
-            if(images.length > 0) {
-                FirebaseFunctions.uploadMultiImage(images, "events")
-                    .then(response => {
-                        setLoader(false);
-                        if (response.length > 0) {
-                            if (newEventData.images && newEventData.images.length > 0) {
-                                newEventData.images = [...newEventData.images, ...response];
-                            } else {
-                                newEventData.images = [...response];
-                            }
-                            props.updateImagesData([]);
-                            update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
+            if(coverData.file){
+                FirebaseFunctions.imageData(cover,"events")
+                    .then(coverRes => {
+                        if(Object.keys(coverRes).length > 0){
+                            newEventData.cover = {...coverRes};
                         }
+                        props.resetCoverData({});
+                        checkSlide(id, newEventData, update);
                     })
                     .catch(error => {
-                        setLoader(false);
-                        addToast(error.message, {
-                            appearance: 'error',
-                            autoDismiss: true,
-                        });
+                    setLoader(false);
+                    addToast(error.message, {
+                        appearance: 'error',
+                        autoDismiss: true,
                     });
+                });
             }else {
-                update ? updateEvent(newEventData, id) : saveEvent(newEventData, id);
+                checkSlide(id, newEventData, update);
             }
+        }
+    }
+
+    const checkSlide = (id, data, update) => {
+        if(images.length > 0) {
+            FirebaseFunctions.uploadMultiImage(images, "events")
+                .then(response => {
+                    setLoader(false);
+                    if (response.length > 0) {
+                        if (data.slide && data.slide.length > 0) {
+                            data.slide = [...data.slide, ...response];
+                        } else {
+                            data.slide = [...response];
+                        }
+                        props.updateImagesData([]);
+                        update ? updateEvent(data, id) : saveEvent(data, id);
+                    }
+                })
+                .catch(error => {
+                    setLoader(false);
+                    addToast(error.message, {
+                        appearance: 'error',
+                        autoDismiss: true,
+                    });
+                });
+        }else {
+            update ? updateEvent(data, id) : saveEvent(data, id);
         }
     }
 
@@ -354,6 +424,7 @@ function Event(props) {
                     const tempEvents = Object.assign({}, {...home.site.events, [id]: {...data}});
                     props.changeEventsState({...tempEvents});
                     setNewEvent({...initEvent});
+                    setCoverData({...initImageData});
                     setSelectedDate(convertDate(new Date()));
                 }
             })
@@ -378,6 +449,7 @@ function Event(props) {
                     const tempEvents = Object.assign({}, {...home.site.events, [id]: {...data}});
                     props.changeEventsState({...tempEvents});
                     setNewEvent({...data});
+                    setCoverData({...initImageData});
                 }
             })
             .catch(error => {
@@ -415,29 +487,53 @@ function Event(props) {
                     <Grid item xs={12}>
                         <form className={classes.form} autoComplete="off" onSubmit={(ev) => saveEventData(ev)}>
                             <Grid container spacing={3}>
+                                <Grid item xs={12} className={classes.inputEv}>
+                                    <TextField
+                                        required
+                                        name={"heading"}
+                                        label={lang.heading}
+                                        variant="outlined"
+                                        className={"input-ev"}
+                                        value={newEvent.heading}
+                                        onChange={(ev) => handleChange(ev)}
+                                    />
+                                    <TextField
+                                        required
+                                        name={"address"}
+                                        label={lang.address}
+                                        variant="outlined"
+                                        className={"input-ev"}
+                                        value={newEvent.location.address}
+                                        onChange={(ev) => handleChange(ev)}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} className={classes.inputEv}>
+                                    <TextField
+                                        required
+                                        name={"mapLink"}
+                                        label={lang.map_link}
+                                        variant="outlined"
+                                        className={"input-ev"}
+                                        value={newEvent.location.mapLink}
+                                        onChange={(ev) => handleChange(ev)}
+                                    />
+                                    <TextField
+                                        name={"mapIframe"}
+                                        label={lang.map_iframe}
+                                        variant="outlined"
+                                        className={"input-ev"}
+                                        value={newEvent.location.mapIframe}
+                                        onChange={(ev) => handleChange(ev)}
+                                    />
+                                </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        required
-                                        name={"title"}
-                                        label={lang.title}
-                                        variant="outlined"
-                                        value={newEvent.title}
-                                        onChange={(ev) => handleChange(ev)}
-                                    />
-                                    <TextField
-                                        required
-                                        name={"location"}
-                                        label={lang.location_}
-                                        variant="outlined"
-                                        value={newEvent.location}
-                                        onChange={(ev) => handleChange(ev)}
-                                    />
-                                    <TextField
                                         id="datetime-local"
+                                        required
                                         label={lang.date}
                                         type="datetime-local"
                                         value={selectedDate}
-                                        className={classes.textField}
+                                        className={`${classes.textField}`}
                                         name={"date"}
                                         InputLabelProps={{
                                             shrink: true,
@@ -450,22 +546,53 @@ function Event(props) {
                                         <Grid item sm={12} md={6} className={classes.imageContent}>
                                             <Button variant="outlined" component="label" className={classes.fileBtn}>
                                                 <PanoramaOutlined htmlColor={"#797979"}/>&nbsp;
-                                                {lang.select_image}
+                                                {lang.select_cover} *
                                                 <input
                                                     type="file"
-                                                    name={"techImg"}
+                                                    name={"cover"}
                                                     className={classes.fileInput}
-                                                    onChange={(e)=>setImage(e)}
+                                                    onChange={(e)=>setImage(e, "cover")}
                                                 />
                                             </Button>
                                             <Button variant="contained" color="primary" type={"button"} className={`${classes.btn} ${classes.loader}`}
-                                                disabled={_loader || !imageData.selectedFile} onClick={()=>addImage()}>
+                                                    disabled={_loader || !coverData.selectedFile} onClick={()=>addImage("cover")}>
+                                                <InsertPhotoOutlined /> {newEvent?.cover?.name ? lang.change : lang.add}
+                                            </Button>
+                                        </Grid>
+                                        <Grid item sm={12} md={6}>
+                                            {coverData.selectedFile ?
+                                                <div className={classes.selectedImage}>
+                                                    <figure className={classes.selectedFile}>
+                                                        <img src={coverData.selectedFile} alt="slide"/>
+                                                    </figure>
+                                                </div>
+                                                :
+                                                newEvent?.cover?.name ?
+                                                    <div className={classes.selectedImage}>
+                                                        <figure className={classes.selectedFile}>
+                                                            <img src={newEvent?.cover?.url} alt="slide"/>
+                                                        </figure>
+                                                    </div> : null
+                                            }
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Grid container spacing={3}>
+                                        <Grid item sm={12} md={6} className={classes.imageContent}>
+                                            <Button variant="outlined" component="label" className={classes.fileBtn}>
+                                                <PanoramaOutlined htmlColor={"#797979"}/>&nbsp;
+                                                {lang.select_slide_image}
+                                                <input
+                                                    type="file"
+                                                    name={"slide"}
+                                                    className={classes.fileInput}
+                                                    onChange={(e)=>setImage(e, "slide")}
+                                                />
+                                            </Button>
+                                            <Button variant="contained" color="primary" type={"button"} className={`${classes.btn} ${classes.loader}`}
+                                                disabled={_loader || !imageData.selectedFile} onClick={()=>addImage("slide")}>
                                                 <InsertPhotoOutlined /> {lang.add}
-                                                {_loader ?
-                                                    <figure>
-                                                        <Loader type="ThreeDots" color="#fff" height={15} width={40}/>
-                                                    </figure> : null
-                                                }
                                             </Button>
                                         </Grid>
                                         <Grid item sm={12} md={6}>
@@ -500,14 +627,14 @@ function Event(props) {
                                         </Grid>
                                     </Grid>
                                 </Grid>
-                                { newEvent.images.length > 0 ?
+                                {newEvent.slide && newEvent.slide.length > 0 ?
                                     <Grid item xs={12}>
-                                        <h4 className={`${classes.h1} ${classes.h4}`}>
-                                            <PermMedia />&nbsp;{lang.images}
+                                        <h4 className={`${classes.h4}`}>
+                                            <PermMedia />&nbsp;{lang.slide}
                                         </h4>
                                         <hr/>
                                         <div>
-                                            {newEvent.images.map(item => (
+                                            {newEvent.slide.map(item => (
                                                 <div className={`${classes.selectedImage} ${classes.delItem}`}
                                                      key={item.name}>
                                                     <figure className={classes.selectedFile}>
@@ -524,8 +651,8 @@ function Event(props) {
                                     </Grid> :
                                         images.length > 0 ?
                                             <Grid item xs={12}>
-                                                <h4 className={`${classes.h1} ${classes.h4}`}>
-                                                    <PermMedia />&nbsp;{lang.images}
+                                                <h4 className={`${classes.h4}`}>
+                                                    <PermMedia />&nbsp;{lang.slide}
                                                 </h4>
                                                 <hr/>
                                                 <div>
@@ -544,7 +671,7 @@ function Event(props) {
                                 {noValid.error ?
                                     <Grid item xs={12}>
                                         <Alert variant="filled" severity="error">
-                                            {lang.error_event_required_fields}
+                                            {noValid.text}
                                         </Alert>
                                     </Grid>
                                     : null
@@ -580,6 +707,8 @@ const mapDispatchToProps = dispatch => {
         changeHomeState: (data) => {dispatch(change_page_data(data))},
         changeEventsState: (data) => {dispatch(change_events_state(data))},
         setNewImage: (data) => {dispatch(set_image(data))},
+        setCoverImage: (data) => {dispatch(set_cover_image(data))},
+        resetCoverData: (data) => {dispatch(reset_cover_data(data))},
         updateImagesData: (data) => {dispatch(update_images_data(data))},
         setRemoveImages: (data) => {dispatch(set_remove_images(data))},
         removeImage: (data) => {dispatch(remove_image(data))},

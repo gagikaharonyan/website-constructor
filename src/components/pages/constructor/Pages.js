@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
     h2: {
         fontSize: 20,
         textAlign: 'left',
+        fontWeight: 600,
     },
     btnSave: {
         width: 300,
@@ -50,17 +51,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initPages = [
-    {name: 'home', title: 'home', state: false, url: "/"},
-    {name: 'posts', title: 'posts', state: false, url: "/posts"},
-    {name: 'events', title: 'events', state: false, url: "events"},
-    {name: 'aboutUs', title: 'about_us', state: false, url: "about"},
-    {name: 'contactUs', title: 'contact_us', state: false, url: "contact-us"},
+    {name: 'home', navName: 'Home', title: 'home', state: false, url: ""},
+    {name: 'posts', navName: 'Posts', title: 'posts', state: false, url: "posts"},
+    {name: 'events', navName: 'Events', title: 'events', state: false, url: "events"},
+    {name: 'aboutUs', navName: 'About us', title: 'about_us', state: false, url: "about"},
+    {name: 'contactUs', navName: 'Contact us', title: 'contact_us', state: false, url: "contact-us"},
 ];
 
 const initDefaultPages = [
-    {name: 'home', url: "/"},
-    {name: 'posts', url: "/posts"},
-    {name: 'events', url: "events"},
+    {name: 'home', navName: 'Home', url: ""},
+    {name: 'posts', navName: 'Posts', url: "posts"},
+    {name: 'events', navName: 'Events', url: "events"},
 ];
 
 function Pages(props) {
@@ -111,7 +112,7 @@ function Pages(props) {
                 item.state = !item.state;
             }
             if(item.state === true){
-                tempPages.push({name: item.name, url: item.url})
+                tempPages.push({name: item.name, navName: item.navName, url: item.url})
             }
             return item;
         })
@@ -197,21 +198,21 @@ function Pages(props) {
                 {/* Default page lists  */}
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <h2 className={`${classes.h1} ${classes.h2}`}>{lang.available_site_pages}:</h2>
+                        <h2 className={`${classes.h2}`}>{lang.available_site_pages}:</h2>
                         <NavBar lang={lang} pagesList={pagesList} addRemovePage={addRemovePage}/>
                     </Paper>
                 </Grid>
                 {/* Selected page lists */}
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <h2 className={`${classes.h1} ${classes.h2}`}>{lang.added_pages}:</h2>
+                        <h2 className={`${classes.h2}`}>{lang.added_pages}:</h2>
                         <NavBarResult lang={lang} selectedPages={selectedPages}/>
                     </Paper>
                 </Grid>
                 {/* Advanced settings section */}
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <h2 className={`${classes.h1} ${classes.h2}`}>{lang.advanced_settings}:</h2>
+                        <h2 className={`${classes.h2}`}>{lang.advanced_settings}:</h2>
                         <hr/>
                         <SettingsSection lang={lang}/>
                     </Paper>

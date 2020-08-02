@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => ({
     },
     h3: {
         color: '#000',
-        textShadow: '0px 4px 3px rgba(0,0,0,0.4), 0px 3px 6px rgba(0, 0, 0, 0.25), 0px 18px 23px rgba(0,0,0,0.1);',
+        fontWeight: 600,
         fontSize: 15,
         textAlign: 'left',
     },
