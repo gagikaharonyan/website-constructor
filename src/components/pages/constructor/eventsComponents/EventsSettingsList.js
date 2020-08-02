@@ -1,12 +1,12 @@
 import React from 'react';
 import {ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {EventNote} from "@material-ui/icons";
+import AddIcon from '@material-ui/icons/Add';
 
 function EventsSettingsList(props) {
     const {lang, showPagesSettings} = props;
 
     const settingsData = [
-        {name: "newEvent", title: "new_event", icon: <EventNote/>},
+        {name: "newEvent", title: "new_event", icon: <AddIcon/>},
     ];
 
     return (
