@@ -98,10 +98,20 @@ function Category(props) {
 
     const addCategory = (textInput) => {
         if (textInput.trim().length > 0) {
-            let id = uuidv1();
-            let sendData = {id, category: textInput};
-            props.addedCategory(sendData)
-            setInputText("")
+            let filtered = data.filter((el) => el.category.toLowerCase() === textInput.toLowerCase())
+
+            if (!filtered.length) {
+                let id = uuidv1(),
+                    sendData = {id, category: textInput};
+                props.addedCategory(sendData)
+                setInputText("")
+            } else {
+                notification.warn({
+                    message: `Notification`,
+                    description: "This category has already been created",
+                    placement: "bottomRight",
+                });
+            }
         } else {
             notification.warn({
                 message: `Notification`,

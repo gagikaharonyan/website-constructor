@@ -160,18 +160,27 @@ export const getAllListPosts = () => {
             } else {
                 let allList = [...Object.values(snapshot.val())],
                     dataSource = [];
+
                 for (let i = 0; i < allList.length; i++) {
                     let obj = {};
+
                     for (let propertyItem in allList[i]) {
-                        if (propertyItem === "PHOTO") {
-                            obj[propertyItem] = allList[i][propertyItem]["imgUrl"]
-                        } else if (propertyItem === "SLIDE") {
-                            obj[propertyItem] = allList[i][propertyItem]["imgUrls"]
-                        } else if (propertyItem === "created_at") {
-                            obj["id"] = allList[i][propertyItem]["time"]
-                        } else {
-                            obj[propertyItem] = allList[i][propertyItem]["text"]
+                        if (propertyItem === "components") {
+                            for (let propertyName in allList[i][propertyItem]) {
+                                if (propertyName === "PHOTO") {
+                                    obj[propertyName] = allList[i][propertyItem][propertyName]["imgUrl"]
+                                } else if (propertyName === "SLIDE") {
+                                    obj[propertyName] = allList[i][propertyItem][propertyName]["imgUrls"]
+                                } else if (propertyName === "VIDEO") {
+                                    obj[propertyName] = "https://www.youtube.com/watch?v=" + allList[i][propertyItem][propertyName]["videoParam"]
+                                } else {
+                                    obj[propertyName] = allList[i][propertyItem][propertyName]["text"]
+                                }
+                            }
+                        }else {
+                            obj[propertyItem] = allList[i][propertyItem]
                         }
+
                     }
 
                     dataSource.push(obj)
@@ -189,9 +198,7 @@ export const fetchAboutUs = () => {
 
         FirebaseFunctions.getAboutUs()
             .then((response) => {
-                console.log('asdasdasd', response)
                 if (response.message === "Database error. Empty `AboutUs` data!") {
-                    console.log("mtela")
                     dispatch(addAboutUs())
                 } else {
                     dispatch(getAboutUs(response[0]))
@@ -200,7 +207,6 @@ export const fetchAboutUs = () => {
             })
             .catch((err) => {
                 if (err.message === "Database error. Empty `AboutUs` data!") {
-                    console.log("mtela")
                     dispatch(addAboutUs())
                 }
                 dispatch(getAboutUs({}))
@@ -225,7 +231,6 @@ export const addAboutUs = () => {
         }
         FirebaseFunctions.addNewData("aboutUs", defaultData.id, {...defaultData})
             .then(response => {
-                console.log("2", response)
                 if (response.result) {
                     dispatch(fetchAboutUs())
                     notification.success({
@@ -236,7 +241,6 @@ export const addAboutUs = () => {
                 }
             })
             .catch(error => {
-                console.log(error)
                 notification.warning({
                     message: `Notification`,
                     description: 'An error occurred, please try again',
@@ -254,7 +258,6 @@ export const changedCategory = (data) => {
         FirebaseFunctions.updateDataById("aboutUs", data.id, {...data})
             .then(response => {
                 if (response.result) {
-                    console.log(response.result)
                     dispatch(fetchAboutUs())
                     notification.success({
                         message: "Notification",
@@ -264,7 +267,6 @@ export const changedCategory = (data) => {
                 }
             })
             .catch(error => {
-                console.log(error)
                 notification.warning({
                     message: `Notification`,
                     description: 'An error occurred, please try again',

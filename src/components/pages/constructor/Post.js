@@ -1,27 +1,14 @@
 import React, {useState} from 'react'
 import SettingsSectionPost from "./postsComponents/SettingsSectionPost";
 import PreviewSettings from "./postsComponents/PreviewSettings";
-import {Button, Grid, Paper, CircularProgress} from "@material-ui/core";
+import {Grid, Paper} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import {makeStyles} from '@material-ui/core/styles';
-import {connect, useSelector} from "react-redux";
+import {connect} from "react-redux";
 import {notification} from "antd";
 import Firebase from "../../../Firebase/Firebase";
 import {change_page_data} from "../../../store/actions/homeAction";
-
-const initialDataPost = {
-    slide: [],
-    heading: "",
-    photo: [],
-    paragraph: "",
-    videoUrl: "",
-    quote: "",
-    listPosts: {
-        allList: [],
-        loading: false,
-        entry: {},
-    }
-};
+import { v1 as uuidv1 } from 'uuid';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -54,36 +41,7 @@ const useStyles = makeStyles((theme) => ({
 function Post(props) {
     const [isLoadingBtnSave, setIsLoadingBtnSave] = useState(false),
           classes = useStyles(),
-          {lang} = props,
-          {home} = useSelector(state => state);
-
-    const validationAdvancedSettings = (post) => {
-        let isValid = true;
-
-        for (let propPost in post) {
-            if (propPost === "slide") {
-                if (!post[propPost].length) {
-                    isValid = false;
-                    notification.warning({
-                        message: lang.notification,
-                        description: `Is a empty ${propPost}`,
-                        placement: "topRight",
-                    });
-                }
-            } else if (propPost === "heading" || propPost === "paragraph" || propPost === "videoUrl" || propPost === "quote") {
-                if (!post[propPost].trim().length) {
-                    isValid = false;
-                    notification.warning({
-                        message: lang.notification,
-                        description: `Is a empty ${propPost}`,
-                        placement: "topRight",
-                    });
-                }
-            }
-        }
-
-        return isValid
-    }
+          {lang} = props;
 
     const saveImageAsStorage = (pic) => {
         return new Promise((resolve, reject) => {
@@ -103,25 +61,43 @@ function Post(props) {
         return Promise.all(urls)
     }
 
-    const handelSendAllChanges = async (e) => {
-        e.preventDefault()
-        let {site} = home,
-            sendData = {},
-            post = {...site.post};
+    const youtubeParser = (url) => {
+        let regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        let match = url.match(regExp);
+        return (match && match[7].length === 11) ? match[7] : false;
+    }
 
-        if (validationAdvancedSettings(post)) {
+    const currentDate = () => {
+        let today = new Date(),
+            dd = String(today.getDate()).padStart(2, '0'),
+            mm = String(today.getMonth() + 1).padStart(2, '0'),
+            yyyy = today.getFullYear();
+
+        return mm + '/' + dd + '/' + yyyy;
+    }
+
+    const handelSendAllChanges = (postData) => {
+        let sendData = {id: uuidv1()};
+
+
             setIsLoadingBtnSave(true)
-            pictureUpload(post.slide).then((imgUrls) => {
-                pictureUpload(post.photo).then((imgUrl) => {
-                    sendData.SLIDE = {type: 'SLIDE', imgUrls};
-                    sendData.PHOTO = {type: 'PHOTO', imgUrl};
-                    sendData.HEADING = {type: 'HEADING', text: post.heading};
-                    sendData.PARAGRAPH = {type: 'PARAGRAPH', text: post.paragraph};
-                    sendData.VIDEO = {type: 'VIDEO', text: post.videoUrl};
-                    sendData.QUOTE = {type: 'QUOTE', text: post.quote};
-                    sendData.created_at = {type: 'created_at', time: new Date().getTime()};
-                    sendData.updated_at = {type: 'updated_at', time: new Date().getTime()};
-                    Firebase.post(new Date().getTime()).set(sendData, function (error) {
+        pictureUpload(postData.sliderImage).then((imgUrls) => {
+            pictureUpload(postData.postImage).then((imgUrl) => {
+                pictureUpload(postData.postPhoto).then((photoUrl) => {
+                    sendData.imgUrl = imgUrl.length > 0 ? imgUrl[0] : "";
+                    sendData.category = postData.CATEGORY;
+                    sendData.title = postData.TITLE;
+                    sendData.dateCreated = currentDate();
+                    sendData.components = {
+                        SLIDE: {type: 'SLIDE', imgUrls},
+                        PHOTO: {type: 'PHOTO', imgUrl: [...photoUrl]},
+                        HEADING: {type: 'HEADING', text: postData.HEADING},
+                        PARAGRAPH: {type: 'PARAGRAPH', text: postData.PARAGRAPH},
+                        QUOTE: {type: 'QUOTE', text: postData.QUOTE},
+                        VIDEO: {type: 'VIDEO', videoParam: youtubeParser(postData.VIDEO)}
+                    };
+
+                      Firebase.post(sendData.id).set(sendData, function (error) {
                         if (error) {
                             notification.warning({
                                 message: lang.notification,
@@ -134,20 +110,13 @@ function Post(props) {
                                 description: lang.post_added,
                                 placement: "topRight",
                             });
-                            props.changeHomeState({
-                                    ...home,
-                                    site: {
-                                        ...home.site,
-                                        post: {...initialDataPost}
-                                    }
-                                }
-                            );
                         }
                         setIsLoadingBtnSave(false)
                     })
                 })
+                })
             })
-        }
+
     }
 
     return (
@@ -182,18 +151,8 @@ function Post(props) {
                         <Paper className={classes.paper}>
                             <h2 className={`${classes.h1} ${classes.h2}`}>{lang.advanced_settings}:</h2>
                             <hr/>
-                            <SettingsSectionPost lang={lang}/>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Paper className={classes.paper}>
-                            {
-                                isLoadingBtnSave ? <CircularProgress size={14}/> : home.currentSetting !== "listPosts" ?
-                                    <Button onClick={handelSendAllChanges} variant="contained" color="primary"
-                                            className={classes.btnSave}>
-                                        {lang.save_all_changes}
-                                    </Button> : null
-                            }
+                            <SettingsSectionPost isLoading={isLoadingBtnSave} sendData={handelSendAllChanges}
+                                                 lang={lang}/>
                         </Paper>
                     </Grid>
                 </Grid>

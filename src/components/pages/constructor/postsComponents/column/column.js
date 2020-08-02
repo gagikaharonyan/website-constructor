@@ -14,6 +14,26 @@ export default function (props, handelEditPost, handelDeletePost) {
             },
         },
         {
+            title: 'Title',
+            dataIndex: 'title',
+            key: Math.random(),
+            sorter: (a, b) => {
+                const strA = a.title || '';
+                const strB = b.title || '';
+                return strA.localeCompare(strB)
+            }
+        },
+        {
+            title: 'Category',
+            dataIndex: 'category',
+            key: Math.random(),
+            sorter: (a, b) => {
+                const strA = a.category || '';
+                const strB = b.category || '';
+                return strA.localeCompare(strB)
+            }
+        },
+        {
             title: 'Quote',
             dataIndex: 'QUOTE',
             key: Math.random(),
@@ -22,21 +42,6 @@ export default function (props, handelEditPost, handelDeletePost) {
                 const strB = b.type || '';
                 return strA.localeCompare(strB)
             }
-        },
-        {
-            title: 'Video',
-            dataIndex: 'VIDEO',
-            key: Math.random(),
-
-            render: video => (
-                // eslint-disable-next-line
-                <a target="_blank"
-                   href={video}
-                   className="utils__link--underlined utils__link--blue"
-                >
-                    {video}
-                </a>
-            ),
         },
         {
             title: 'Action',

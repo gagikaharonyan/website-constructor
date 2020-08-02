@@ -4,13 +4,8 @@ import {makeStyles} from '@material-ui/core/styles';
 import {AssignmentLate} from '@material-ui/icons';
 
 /* tools components */
-import Slider from "./settings/Slider";
-import Heading from "./settings/Heading";
-import Photo from "./settings/Photo";
-import Paragraph from "./settings/Paragraph";
-import Video from "./settings/Video";
-import Quote from "./settings/Quote";
 import ListPosts from "./settings/ListPosts";
+import CreateNewPost from "./settings/createNewPost";
 
 const useStyles = makeStyles(() => ({
     noSelected: {
@@ -39,26 +34,11 @@ function SettingsSectionPost(props) {
     let type = home.currentSetting;
 
     switch (type) {
-        case "slider":
-            title = "post_slide";
-            break;
-        case "heading":
-            title = "post_heading";
-            break;
-        case "photo":
-            title = "post_photo";
-            break;
-        case "paragraph":
-            title = "post_paragraph";
-            break;
-        case "video":
-            title = "post_video";
-            break;
-        case "quote":
-            title = "post_quote";
-            break;
         case "listPosts":
             title = "List Posts";
+            break;
+        case "createNewPost":
+            title = "Create new post";
             break;
         default:
             title = "settings";
@@ -76,20 +56,10 @@ function SettingsSectionPost(props) {
             <h3 className={classes.h3}>{home.currentSetting !== "" ? lang[title] : lang.settings}</h3>
             {(() => {
                 switch (type) {
-                    case "slider":
-                        return <Slider lang={lang}/>
-                    case "heading":
-                        return <Heading lang={lang}/>
-                    case "photo":
-                        return <Photo lang={lang}/>
-                    case "paragraph":
-                        return <Paragraph lang={lang}/>
-                    case "video":
-                        return <Video lang={lang}/>
-                    case "quote":
-                        return <Quote lang={lang}/>
                     case "listPosts":
                         return <ListPosts lang={lang}/>
+                    case "createNewPost":
+                        return <CreateNewPost isLoading={props.isLoading} sendData={props.sendData} lang={lang}/>
                     default:
                         return notSelected;
                 }

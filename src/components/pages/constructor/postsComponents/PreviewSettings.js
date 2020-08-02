@@ -4,10 +4,6 @@ import {makeStyles} from "@material-ui/core/styles";
 import {AssignmentLate} from "@material-ui/icons";
 
 /* preview apply settings */
-import PreviewSlider from "./preview/PreviewSlider";
-import PreviewParagraph from "./preview/PreviewParagraph";
-import PreviewPhoto from "./preview/PreviewPhoto";
-import PreviewVideo from "./preview/PreviewVideo";
 import PreviewItemList from "./preview/PreviewItemList";
 
 const useStyles = makeStyles(() => ({
@@ -36,29 +32,10 @@ function PreviewSettings(props) {
         </div>
     );
 
-    const notPreview = (text) => (
-        <div className={classes.noSelected}>
-            <AssignmentLate/>
-            <span>{text}!</span>
-        </div>
-    );
-
     return (
         <div>
             {(() => {
                 switch (type) {
-                    case "slider":
-                        return <PreviewSlider lang={lang}/>
-                    case "heading":
-                        return notPreview(lang.no_preview_heading)
-                    case "photo":
-                        return <PreviewPhoto lang={lang}/>
-                    case "paragraph":
-                        return <PreviewParagraph lang={lang}/>
-                    case "video":
-                        return <PreviewVideo lang={lang}/>
-                    case "quote":
-                        return notPreview(lang.no_preview_quote)
                     case "listPosts":
                         return <PreviewItemList lang={lang}/>
                     default:
