@@ -58,6 +58,9 @@ const useStyles = makeStyles((theme) => ({
         width: '50%',
         marginLeft: 4,
     },
+    hr25: {
+        width: '25%',
+    },
     content: {
         textAlign: 'left',
     },
@@ -77,7 +80,7 @@ function EventsList(props) {
     const {lang, events, updateEventsList, editEvent} = props;
 
     const deleteEvent = (id) => {
-        FirebaseFunctions.deleteEventById(id, events[id].imageName)
+        FirebaseFunctions.deleteEventById(id, events[id].images)
             .then(response => {
                 if(response.result){
                     addToast(lang.event_deleted_successfully, {
@@ -123,7 +126,8 @@ function EventsList(props) {
                                     </Grid>
                                     <Grid item xs={4} className={classes.image}>
                                         <figure>
-                                            <img src={events[item].imageUrl ? events[item].imageUrl : '/images/upcoming-event.jpg'} alt="event"/>
+                                            <img src={events[item].images && events[item].images.length > 0 ?
+                                                events[item].images[0].url : '/images/upcoming-event.jpg'} alt="event"/>
                                         </figure>
                                     </Grid>
                                     <Grid item xs={8} className={classes.content}>
@@ -134,6 +138,13 @@ function EventsList(props) {
                                             <div dangerouslySetInnerHTML={{ __html: events[item].details }} />
                                         </div>
                                         <hr className={classes.hr}/>
+                                        <div>
+                                            <span className={`${classes.h1} ${classes.subTitle}`}>
+                                                {lang.location_}:&nbsp;
+                                            </span>
+                                            {events[item].location}
+                                        </div>
+                                        <hr className={`${classes.hr} ${classes.hr25}`}/>
                                         <div>
                                             <span className={`${classes.h1} ${classes.subTitle}`}>
                                                 {lang.date}:&nbsp;

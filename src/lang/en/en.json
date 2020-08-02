@@ -118,5 +118,6 @@
   "images": "Images",
   "error_empty_value": "You cannot add an empty value!",
   "error_empty_image": "You have not selected an image to add!",
-  "warning_image": "After deleting images the image file is deleted from the storage location, but the link remains in the database, to avoid errors don't forget to save all changes after deleting the image!"
+  "warning_image": "After deleting images the image file is deleted from the storage location, but the link remains in the database, to avoid errors don't forget to save all changes after deleting the image!",
+  "location_": "Location"
 }

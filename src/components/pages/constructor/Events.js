@@ -40,6 +40,7 @@ function Events(props) {
             })
             .catch(error => {
                 setEventsData({});
+                props.changeEventsState({});
                 addToast(error.message, {
                     appearance: 'error',
                     autoDismiss: true,
