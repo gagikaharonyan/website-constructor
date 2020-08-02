@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Paper, Grid} from '@material-ui/core';
-import {CheckBoxOutlineBlank} from '@material-ui/icons';
+import {Grid} from '@material-ui/core';
+import data from "../../../constants";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2),
         textAlign: 'center',
         color: theme.palette.text.secondary,
-        height: 300,
+        height: 600,
         fontSize: 20,
         display: "flex",
         justifyContent: "center",
@@ -24,13 +24,15 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UnknownSection(props) {
     const classes = useStyles();
-    const {lang} =props;
 
     return (
         <div className={classes.root}>
             <Grid container spacing={3}>
                 <Grid item xs={12}>
-                    <Paper className={classes.paper}><CheckBoxOutlineBlank /> <span>{lang.select_section_to_edit}</span></Paper>
+                    <iframe width="800" height="500" src={data.presentationYoutubeLink}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen/>
                 </Grid>
             </Grid>
         </div>
