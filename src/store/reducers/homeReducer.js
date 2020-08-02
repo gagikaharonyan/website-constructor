@@ -8,6 +8,11 @@ import {
     ADD_CONTACT_DATA,
     ADD_UPDATE_NETWORKS_LINKS,
     ADD_UPDATE_SLIDER_IMAGE,
+    GET_DATA_POSTS,
+    GET_CATEGORIES,
+    LOADING_CATEGORIES,
+    GET_DATA_ABOUTUS,
+    LOADING_ABOUTUS
 } from '../constants';
 
 const initState = {
@@ -26,8 +31,29 @@ const initState = {
             networks: {},
             slider: [],
         },
+        post: {
+            slide: [],
+            heading: "",
+            photo: [],
+            paragraph: "",
+            videoUrl: "",
+            quote: "",
+            listPosts: {
+                allList: [],
+                loading: false,
+                entry: {},
+            }
+        },
         contactUs: [],
         events: {},
+        categories: {
+            data: [],
+            isLoading: false
+        },
+        aboutUs: {
+            data: {},
+            isLoading: false
+        }
     },
 };
 
@@ -93,6 +119,61 @@ const homeReducer = (state= initState,{type,payload}) => {
                     ...state.site, navBar: {
                         ...state.site.navBar,
                         slider: [...payload]
+                    }
+                }
+            }
+        case GET_DATA_POSTS:
+            return {
+                ...state,
+                site: {
+                    ...state.site,
+                    post: {
+                        ...state.site.post,
+                        listPosts: {
+                            ...state.site.post.listPosts,
+                            allList: [...payload],
+                            loading: false,
+                        }
+                    }
+                }
+            }
+        case GET_CATEGORIES:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    categories: {
+                        ...state.site.categories,
+                        data: [...payload]
+                    }
+                }
+            }
+        case LOADING_CATEGORIES:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    categories: {
+                        ...state.site.categories,
+                        isLoading: payload
+                    }
+                }
+            }
+        case GET_DATA_ABOUTUS:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    aboutUs: {
+                        ...state.site.aboutUs,
+                        data: {...payload}
+                    }
+                }
+            }
+        case LOADING_ABOUTUS:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    aboutUs: {
+                        ...state.site.aboutUs,
+                        isLoading: payload
                     }
                 }
             }

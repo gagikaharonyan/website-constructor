@@ -21,6 +21,7 @@ class Firebase {
         this.auth = app.auth()
         this.database = app.database()
         this.storage = app.storage()
+        this.db = app.database();
     }
 
     doCreateUserWithEmailAndPassword = (email, password) =>
@@ -32,6 +33,16 @@ class Firebase {
     doSignOut = () => this.auth.signOut()
 
     getCurrentUser = () => this.auth.currentUser
+
+    post = uid => this.db.ref(`posts/${uid}`)
+
+    getListPosts = () => this.db.ref(`posts`)
+
+    getCategories = () => this.db.ref(`categories`)
+
+    addCategory = (id) => this.db.ref(`categories/${id}`)
+
+    getAboutUs = () => this.db.ref(`aboutUs`)
 }
 
 let FB = new Firebase()

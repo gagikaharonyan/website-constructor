@@ -55,6 +55,7 @@ function Header(props) {
         if(!admin.isLogged && !adminId){
             setRedirectTo(true)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[redirectTo]);
 
     const handleLogout = (ev) => {

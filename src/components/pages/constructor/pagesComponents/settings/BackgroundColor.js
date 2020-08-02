@@ -33,6 +33,7 @@ function BackgroundColor(props) {
         if(home.site.navBar.backgroundColor !== ""){
             setColor(home.site.navBar.backgroundColor);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
 
     const changeColor = (color) => {

@@ -229,6 +229,7 @@ function Event(props) {
             setNewEvent({...initEvent});
             setSelectedDate(convertDate(new Date()));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[editEventData]);
 
     const handleChange = (ev) => {

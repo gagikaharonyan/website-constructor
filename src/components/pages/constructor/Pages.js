@@ -75,6 +75,7 @@ function Pages(props) {
 
     useEffect(function () {
         getNavBardData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const getNavBardData = () => {

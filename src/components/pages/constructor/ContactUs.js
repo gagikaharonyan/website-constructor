@@ -105,6 +105,7 @@ function ContactUs(props) {
         if(!temp[0]){
             getContactsData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
