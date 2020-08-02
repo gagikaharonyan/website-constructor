@@ -8,6 +8,7 @@ import homeReducer from "./reducers/homeReducer";
 import adminReducer from "./reducers/adminReducer";
 import imagesReducer from "./reducers/imagesReducer";
 import removeImagesReducer from "./reducers/removeImagesReducer";
+import coverReducer from "./reducers/coverReducer";
 
 const AllReducers = combineReducers({
     language: languageReducer,
@@ -15,6 +16,7 @@ const AllReducers = combineReducers({
     admin: adminReducer,
     images: imagesReducer,
     removeImages: removeImagesReducer,
+    cover: coverReducer,
 });
 
 const InitialState = {};

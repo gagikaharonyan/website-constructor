@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
     h2: {
         fontSize: 20,
         textAlign: 'left',
+        fontWeight: 600,
     },
     btnSave: {
         width: 300,
@@ -196,21 +197,21 @@ function Pages(props) {
                 {/* Default page lists  */}
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <h2 className={`${classes.h1} ${classes.h2}`}>{lang.available_site_pages}:</h2>
+                        <h2 className={`${classes.h2}`}>{lang.available_site_pages}:</h2>
                         <NavBar lang={lang} pagesList={pagesList} addRemovePage={addRemovePage}/>
                     </Paper>
                 </Grid>
                 {/* Selected page lists */}
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <h2 className={`${classes.h1} ${classes.h2}`}>{lang.added_pages}:</h2>
+                        <h2 className={`${classes.h2}`}>{lang.added_pages}:</h2>
                         <NavBarResult lang={lang} selectedPages={selectedPages}/>
                     </Paper>
                 </Grid>
                 {/* Advanced settings section */}
                 <Grid item xs={12}>
                     <Paper className={classes.paper}>
-                        <h2 className={`${classes.h1} ${classes.h2}`}>{lang.advanced_settings}:</h2>
+                        <h2 className={`${classes.h2}`}>{lang.advanced_settings}:</h2>
                         <hr/>
                         <SettingsSection lang={lang}/>
                     </Paper>

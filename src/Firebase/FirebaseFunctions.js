@@ -220,6 +220,7 @@ const FirebaseFunctions = {
     deleteImageByName, // delete image by name from firebase store
     uploadMultiImage, // upload multi image in from firebase store
     removeSelectedImages, // remove images from firebase store
+    imageData, // upload image in firebase store
 };
 
 export default FirebaseFunctions;

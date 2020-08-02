@@ -2,7 +2,7 @@ import React from "react";
 import {useToasts} from 'react-toast-notifications';
 import {makeStyles} from '@material-ui/core/styles';
 import {Grid, Paper, Button} from "@material-ui/core";
-import {CalendarToday, DeleteForeverOutlined, EditOutlined} from '@material-ui/icons';
+import {CalendarToday, DeleteForeverOutlined, EditOutlined, Link} from '@material-ui/icons';
 import FirebaseFunctions from "../../../../Firebase/FirebaseFunctions";
 
 const useStyles = makeStyles((theme) => ({
@@ -72,6 +72,15 @@ const useStyles = makeStyles((theme) => ({
             margin: theme.spacing(1),
         },
     },
+    bold: {
+        fontWeight: 600,
+        color: 'black',
+    },
+    mapLink: {
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        color: 'blue',
+    },
 }));
 
 function EventsList(props) {
@@ -80,7 +89,9 @@ function EventsList(props) {
     const {lang, events, updateEventsList, editEvent} = props;
 
     const deleteEvent = (id) => {
-        FirebaseFunctions.deleteEventById(id, events[id].images)
+        const slideImages = events[id]?.slide ? [...events[id]?.slide] : [];
+        slideImages.push(events[id].cover);
+        FirebaseFunctions.deleteEventById(id, [...slideImages])
             .then(response => {
                 if(response.result){
                     addToast(lang.event_deleted_successfully, {
@@ -113,8 +124,8 @@ function EventsList(props) {
                         Object.keys(events).map(item => (
                             <Grid item xs={12} key={item}>
                                 <Grid container spacing={3}>
-                                    <Grid item xs={12} className={`${classes.h1} ${classes.title}`}>
-                                        <span>{events[item].title}</span>
+                                    <Grid item xs={12} className={`${classes.bold} ${classes.title}`}>
+                                        <span>{events[item].heading}</span>
                                         <span className={classes.buttons}>
                                             <Button variant="outlined" color="primary" onClick={() => editEvent(item)}>
                                                 <EditOutlined /> {lang.edit}
@@ -126,27 +137,37 @@ function EventsList(props) {
                                     </Grid>
                                     <Grid item xs={4} className={classes.image}>
                                         <figure>
-                                            <img src={events[item].images && events[item].images.length > 0 ?
-                                                events[item].images[0].url : '/images/upcoming-event.jpg'} alt="event"/>
+                                            <img src={events[item]?.cover && events[item]?.cover?.url ?
+                                                events[item].cover.url : '/images/upcoming-event.jpg'} alt="event"/>
                                         </figure>
                                     </Grid>
                                     <Grid item xs={8} className={classes.content}>
                                         <div>
-                                            <span className={`${classes.h1} ${classes.subTitle}`}>
+                                            <span className={`${classes.bold} ${classes.subTitle}`}>
                                                 {lang.details}:
                                             </span><br/>
                                             <div dangerouslySetInnerHTML={{ __html: events[item].details }} />
                                         </div>
                                         <hr className={classes.hr}/>
                                         <div>
-                                            <span className={`${classes.h1} ${classes.subTitle}`}>
-                                                {lang.location_}:&nbsp;
+                                            <span className={`${classes.bold} ${classes.subTitle}`}>
+                                                {lang.address}:&nbsp;
                                             </span>
-                                            {events[item].location}
+                                            {events[item].location.address}
                                         </div>
                                         <hr className={`${classes.hr} ${classes.hr25}`}/>
                                         <div>
-                                            <span className={`${classes.h1} ${classes.subTitle}`}>
+                                            <span className={`${classes.bold} ${classes.subTitle}`}>
+                                                {lang.map_link}:&nbsp;
+                                            </span>
+                                            <a href={events[item].location.mapLink} target={"_blank"} className={classes.mapLink}
+                                                rel="noopener noreferrer">
+                                                <Link />
+                                            </a>
+                                        </div>
+                                        <hr className={`${classes.hr} ${classes.hr25}`}/>
+                                        <div>
+                                            <span className={`${classes.bold} ${classes.subTitle}`}>
                                                 {lang.date}:&nbsp;
                                             </span>
                                             {events[item].date}
