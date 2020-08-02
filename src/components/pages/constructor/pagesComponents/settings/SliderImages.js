@@ -6,7 +6,7 @@ import {remove_image} from "../../../../../store/actions/removeImagesAction";
 import {useToasts} from "react-toast-notifications";
 import {makeStyles} from '@material-ui/core/styles';
 import {Button, Grid} from '@material-ui/core';
-import {PermMedia, PanoramaOutlined, InsertPhotoOutlined, Clear} from "@material-ui/icons";
+import {PermMedia, InsertPhotoOutlined, Clear} from "@material-ui/icons";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -90,6 +90,37 @@ const useStyles = makeStyles(() => ({
             marginRight: 3,
         },
     },
+    uploadContent: {
+        display: 'table',
+        float: 'left',
+        width: 104,
+        height: 104,
+        marginRight: 50,
+        marginBottom: 8,
+        textAlign: 'center',
+        verticalAlign: 'top',
+        backgroundColor: '#fafafa',
+        border: '1px dashed #d9d9d9',
+        borderRadius: 2,
+        cursor: 'pointer',
+        transition: 'border-color 0.3s ease',
+        '& > span': {
+            display: 'table-cell',
+            width: '100%',
+            height: '100%',
+            padding: 8,
+            textAlign: 'center',
+            verticalAlign: 'middle',
+            fontSize: 14,
+            textTransform: 'capitalize',
+            '& > input': {
+                display: 'none',
+            },
+        },
+        '&:hover':{
+            borderColor: '#1890ff',
+        },
+    },
 }));
 
 const initImageData = {
@@ -167,15 +198,16 @@ function SliderImages(props) {
                         <Grid item xs={12}>
                             <Grid container spacing={3}>
                                 <Grid item sm={12} md={6} className={classes.imageContent}>
-                                    <Button variant="outlined" component="label" className={classes.fileBtn}>
-                                        <PanoramaOutlined htmlColor={"#797979"}/>&nbsp;
-                                        {lang.select_image}
-                                        <input
-                                            type="file"
-                                            name={"slide"}
-                                            className={classes.fileInput}
-                                            onChange={(e)=>setImage(e)}
-                                        />
+                                    <Button component="label" className={classes.uploadContent}>
+                                        <span>
+                                            <input
+                                                type="file"
+                                                name={"slide"}
+                                                className={classes.fileInput}
+                                                onChange={(e)=>setImage(e)}
+                                            />
+                                            + {lang.upload}
+                                        </span>
                                     </Button>
                                 </Grid>
                                 <Grid item sm={12} md={6}>

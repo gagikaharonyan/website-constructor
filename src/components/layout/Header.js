@@ -31,6 +31,7 @@ const useStyle = makeStyles({
         '& span': {
             fontSize: 18,
             display: 'inline-block',
+            color: 'black',
         },
     },
     menu: {

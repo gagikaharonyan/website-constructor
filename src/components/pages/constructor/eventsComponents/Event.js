@@ -140,6 +140,48 @@ const useStyles = makeStyles((theme) => ({
             width: '400px',
         },
     },
+    uploadContent: {
+        display: 'table',
+        float: 'left',
+        width: 104,
+        height: 104,
+        marginRight: 50,
+        marginBottom: 8,
+        textAlign: 'center',
+        verticalAlign: 'top',
+        backgroundColor: '#fafafa',
+        border: '1px dashed #d9d9d9',
+        borderRadius: 2,
+        cursor: 'pointer',
+        transition: 'border-color 0.3s ease',
+        '& > span': {
+            display: 'table-cell',
+            width: '100%',
+            height: '100%',
+            padding: 8,
+            textAlign: 'center',
+            verticalAlign: 'middle',
+            fontSize: 14,
+            textTransform: 'capitalize',
+            '& > input': {
+                display: 'none',
+            },
+        },
+        '&:hover':{
+            borderColor: '#1890ff',
+        },
+    },
+    uploadImageTitle: {
+        '& > div': {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'black',
+        },
+        '& hr': {
+            width: '75%',
+        },
+    }
 }));
 
 const initEvent = {
@@ -492,7 +534,6 @@ function Event(props) {
                                         required
                                         name={"heading"}
                                         label={lang.heading}
-                                        variant="outlined"
                                         className={"input-ev"}
                                         value={newEvent.heading}
                                         onChange={(ev) => handleChange(ev)}
@@ -501,7 +542,6 @@ function Event(props) {
                                         required
                                         name={"address"}
                                         label={lang.address}
-                                        variant="outlined"
                                         className={"input-ev"}
                                         value={newEvent.location.address}
                                         onChange={(ev) => handleChange(ev)}
@@ -512,7 +552,6 @@ function Event(props) {
                                         required
                                         name={"mapLink"}
                                         label={lang.map_link}
-                                        variant="outlined"
                                         className={"input-ev"}
                                         value={newEvent.location.mapLink}
                                         onChange={(ev) => handleChange(ev)}
@@ -520,7 +559,6 @@ function Event(props) {
                                     <TextField
                                         name={"mapIframe"}
                                         label={lang.map_iframe}
-                                        variant="outlined"
                                         className={"input-ev"}
                                         value={newEvent.location.mapIframe}
                                         onChange={(ev) => handleChange(ev)}
@@ -543,16 +581,23 @@ function Event(props) {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Grid container spacing={3}>
+                                        <Grid item sm={12} className={classes.uploadImageTitle}>
+                                            <div>
+                                                <PanoramaOutlined htmlColor={"#797979"}/>&nbsp; {lang.select_cover} *
+                                            </div>
+                                            <hr/>
+                                        </Grid>
                                         <Grid item sm={12} md={6} className={classes.imageContent}>
-                                            <Button variant="outlined" component="label" className={classes.fileBtn}>
-                                                <PanoramaOutlined htmlColor={"#797979"}/>&nbsp;
-                                                {lang.select_cover} *
-                                                <input
-                                                    type="file"
-                                                    name={"cover"}
-                                                    className={classes.fileInput}
-                                                    onChange={(e)=>setImage(e, "cover")}
-                                                />
+                                            <Button component="label" className={classes.uploadContent}>
+                                                <span>
+                                                    <input
+                                                        type="file"
+                                                        name={"cover"}
+                                                        className={classes.fileInput}
+                                                        onChange={(e)=>setImage(e, "cover")}
+                                                    />
+                                                    + {lang.upload}
+                                                </span>
                                             </Button>
                                             <Button variant="contained" color="primary" type={"button"} className={`${classes.btn} ${classes.loader}`}
                                                     disabled={_loader || !coverData.selectedFile} onClick={()=>addImage("cover")}>
@@ -579,16 +624,23 @@ function Event(props) {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Grid container spacing={3}>
+                                        <Grid item sm={12} className={classes.uploadImageTitle}>
+                                            <div>
+                                                <PanoramaOutlined htmlColor={"#797979"}/>&nbsp; {lang.select_slide_image}
+                                            </div>
+                                            <hr/>
+                                        </Grid>
                                         <Grid item sm={12} md={6} className={classes.imageContent}>
-                                            <Button variant="outlined" component="label" className={classes.fileBtn}>
-                                                <PanoramaOutlined htmlColor={"#797979"}/>&nbsp;
-                                                {lang.select_slide_image}
-                                                <input
-                                                    type="file"
-                                                    name={"slide"}
-                                                    className={classes.fileInput}
-                                                    onChange={(e)=>setImage(e, "slide")}
-                                                />
+                                            <Button component="label" className={classes.uploadContent}>
+                                                <span>
+                                                    <input
+                                                        type="file"
+                                                        name={"slide"}
+                                                        className={classes.fileInput}
+                                                        onChange={(e)=>setImage(e, "slide")}
+                                                    />
+                                                    + {lang.upload}
+                                                </span>
                                             </Button>
                                             <Button variant="contained" color="primary" type={"button"} className={`${classes.btn} ${classes.loader}`}
                                                 disabled={_loader || !imageData.selectedFile} onClick={()=>addImage("slide")}>

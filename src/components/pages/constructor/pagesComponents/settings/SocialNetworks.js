@@ -50,7 +50,8 @@ const useStyles = makeStyles((theme) => ({
         '& a': {
             fontSize: 16,
             fontFamily: '"Comic Sans MS", cursive, sans-serif',
-            textDecoration: 'underline'
+            textDecoration: 'underline',
+            color: 'black',
         },
     },
     contactData: {

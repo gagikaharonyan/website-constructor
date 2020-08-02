@@ -13,6 +13,7 @@ const useStyles = makeStyles(() => ({
     navItem: {
         '& span': {
             fontWeight: 600,
+            color: 'white',
         },
     },
 }));

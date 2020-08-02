@@ -129,5 +129,6 @@
   "heading": "Heading",
   "address": "Address",
   "map_link": "Map link",
-  "map_iframe": "Map iframe"
+  "map_iframe": "Map iframe",
+  "upload": "Upload"
 }
