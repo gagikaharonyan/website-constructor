@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
         padding: "20px 20px 10px 20px",
         marginTop: "30px",
         border: "2px solid #c1c1c1",
-        borderRadius: "49px",
+        borderRadius: "15px",
     },
     image: {
         '& img': {
