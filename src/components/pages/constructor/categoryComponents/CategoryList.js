@@ -18,12 +18,14 @@ const useStyles = makeStyles((theme) => ({
     },
     itemCatgeory: {
         marginTop: "10px",
+        padding: '15px',
+        fontWeight: '600',
         '&:hover': {
             color: 'black',
-            fontWeight: 'bold',
             cursor: 'pointer',
             backgroundColor: '#c3e6cb',
-            borderRadius: "10px"
+            borderRadius: "10px",
+            padding:"15px"
         }
     },
     nameCategory: {
