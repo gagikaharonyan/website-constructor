@@ -122,7 +122,7 @@ function LoginForm(props) {
             <h2>{lang.log_in}</h2>
             <TextField className={classes.textInput} label={lang.login} name={"login"} value={adminData.login} onChange={e => handleChangeData(e)}/>
             {validator.login && <span className={classes.errorMessage}>{lang.error_reg_login}</span>}
-            <TextField className={classes.textInput} label={lang.password} name={"password"} value={adminData.password} onChange={e => handleChangeData(e)}/>
+            <TextField type="password" className={classes.textInput} label={lang.password} name={"password"} value={adminData.password} onChange={e => handleChangeData(e)}/>
             {validator.password && <span className={classes.errorMessage}>{lang.error_reg_pass}</span>}
             <Button type="submit" color="primary" disabled={(validator.login || validator.password)}>{lang.login}</Button>
         </form>
