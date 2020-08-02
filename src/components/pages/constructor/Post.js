@@ -135,7 +135,7 @@ function Post(props) {
                             </Grid>
                         </Paper>
                     </Grid>
-                    {/* Preview Advanced settings */}
+                    {/* Preview Post*/}
                     {
                         <Grid item xs={12}>
                             <Paper className={classes.paper}>
