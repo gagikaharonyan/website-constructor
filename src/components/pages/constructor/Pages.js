@@ -51,17 +51,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const initPages = [
-    {name: 'home', title: 'home', state: false, url: "/"},
-    {name: 'posts', title: 'posts', state: false, url: "/posts"},
-    {name: 'events', title: 'events', state: false, url: "events"},
-    {name: 'aboutUs', title: 'about_us', state: false, url: "about"},
-    {name: 'contactUs', title: 'contact_us', state: false, url: "contact-us"},
+    {name: 'home', navName: 'Home', title: 'home', state: false, url: ""},
+    {name: 'posts', navName: 'Posts', title: 'posts', state: false, url: "posts"},
+    {name: 'events', navName: 'Events', title: 'events', state: false, url: "events"},
+    {name: 'aboutUs', navName: 'About us', title: 'about_us', state: false, url: "about"},
+    {name: 'contactUs', navName: 'Contact us', title: 'contact_us', state: false, url: "contact-us"},
 ];
 
 const initDefaultPages = [
-    {name: 'home', url: "/"},
-    {name: 'posts', url: "/posts"},
-    {name: 'events', url: "events"},
+    {name: 'home', navName: 'Home', url: ""},
+    {name: 'posts', navName: 'Posts', url: "posts"},
+    {name: 'events', navName: 'Events', url: "events"},
 ];
 
 function Pages(props) {
@@ -111,7 +111,7 @@ function Pages(props) {
                 item.state = !item.state;
             }
             if(item.state === true){
-                tempPages.push({name: item.name, url: item.url})
+                tempPages.push({name: item.name, navName: item.navName, url: item.url})
             }
             return item;
         })
