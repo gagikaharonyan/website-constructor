@@ -42,6 +42,7 @@ class Firebase {
 
     addCategory = (id) => this.db.ref(`categories/${id}`)
 
+    getAboutUs = () => this.db.ref(`aboutUs`)
 }
 
 let FB = new Firebase()

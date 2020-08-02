@@ -10,7 +10,9 @@ import {
     ADD_UPDATE_SLIDER_IMAGE,
     GET_DATA_POSTS,
     LOADING_CATEGORIES,
-    GET_CATEGORIES
+    GET_CATEGORIES,
+    LOADING_ABOUTUS,
+    GET_DATA_ABOUTUS
 } from '../constants';
 import Firebase from "../../Firebase/Firebase";
 import FirebaseFunctions from "../../Firebase/FirebaseFunctions";
@@ -180,6 +182,114 @@ export const getAllListPosts = () => {
         });
     }
 }
+
+export const fetchAboutUs = () => {
+    return (dispatch) => {
+        dispatch(loadingAboutUs(true))
+
+        FirebaseFunctions.getAboutUs()
+            .then((response) => {
+                console.log('asdasdasd', response)
+                if (response.message === "Database error. Empty `AboutUs` data!") {
+                    console.log("mtela")
+                    dispatch(addAboutUs())
+                } else {
+                    dispatch(getAboutUs(response[0]))
+                    dispatch(loadingAboutUs(false))
+                }
+            })
+            .catch((err) => {
+                if (err.message === "Database error. Empty `AboutUs` data!") {
+                    console.log("mtela")
+                    dispatch(addAboutUs())
+                }
+                dispatch(getAboutUs({}))
+                dispatch(loadingAboutUs(false))
+            });
+    }
+};
+
+export const addAboutUs = () => {
+    return (dispatch) => {
+        let defaultData = {
+            id: new Date().getTime(),
+            title: "Title",
+            description: `
+              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. 
+              The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here,
+              content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as 
+              their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have
+              evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+              `,
+            avatar: "https://www.google.ru/url?sa=i&url=https%3A%2F%2Fwww.impactbnd.com%2Fblog%2Fbest-about-us-pages&psig=AOvVaw1FncZgOpktQkck637uUTxG&ust=1596406271567000&source=images&cd=vfe&ved=0CAIQjRxqFwoTCOCspfiC--oCFQAAAAAdAAAAABAD"
+        }
+        FirebaseFunctions.addNewData("aboutUs", defaultData.id, {...defaultData})
+            .then(response => {
+                console.log("2", response)
+                if (response.result) {
+                    dispatch(fetchAboutUs())
+                    notification.success({
+                        message: "Notification",
+                        description: "You changed About Us Info",
+                        placement: "bottomRight",
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                notification.warning({
+                    message: `Notification`,
+                    description: 'An error occurred, please try again',
+                    placement: "bottomRight",
+                });
+                dispatch(loadingAboutUs(false))
+            });
+    }
+}
+
+export const changedCategory = (data) => {
+    return (dispatch) => {
+        dispatch(loadingAboutUs(true))
+
+        FirebaseFunctions.updateDataById("aboutUs", data.id, {...data})
+            .then(response => {
+                if (response.result) {
+                    console.log(response.result)
+                    dispatch(fetchAboutUs())
+                    notification.success({
+                        message: "Notification",
+                        description: "You changed About Us Info",
+                        placement: "bottomRight",
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                notification.warning({
+                    message: `Notification`,
+                    description: 'An error occurred, please try again',
+                    placement: "bottomRight",
+                });
+                dispatch(loadingAboutUs(false))
+            });
+    }
+}
+
+
+export const getAboutUs = (payload) => {
+    return {
+        type: GET_DATA_ABOUTUS,
+        payload: payload
+    }
+}
+
+export const loadingAboutUs = (boolean) => {
+    return {
+        type: LOADING_ABOUTUS,
+        payload: boolean
+    }
+}
+
 
 export const setStatePostsData = (data) => {
     return {

@@ -111,6 +111,22 @@ const getCategories = () => {
     });
 };
 
+/* Get AboutUs Data */
+const getAboutUs = () => {
+    return new Promise(function (resolve, reject) {
+        Firebase.getAboutUs().once('value').then(function (snapshot) {
+            let aboutUsData = snapshot.val();
+            if (aboutUsData && Object.keys(aboutUsData).length !== 0 && aboutUsData.constructor === Object) {
+                resolve(Object.values(aboutUsData));
+            } else if (aboutUsData == null) {
+                reject({message: 'Database error. Empty `AboutUs` data!'});
+            }
+        }).catch(error => {
+            reject({message: `Database error. 'AboutUs' data! ${error.message}`});
+        });
+    });
+};
+
 /* Deleting images from storage */ /* (static) */
 const deleteImage = (data) => {
     return new Promise(function(resolve, reject) {
@@ -188,6 +204,7 @@ const FirebaseFunctions = {
     uploadImage, // upload image in firebase store
     getEvents, // get all events data from firebase db
     getCategories, // get all Category data from firebase db
+    getAboutUs, // get all AboutUs data from firebase db
     deleteEventById, // delete event by id from firebase db
     updateDataById, // update data by id in firebase db
     updateData, // update data in firebase db

@@ -10,7 +10,9 @@ import {
     ADD_UPDATE_SLIDER_IMAGE,
     GET_DATA_POSTS,
     GET_CATEGORIES,
-    LOADING_CATEGORIES
+    LOADING_CATEGORIES,
+    GET_DATA_ABOUTUS,
+    LOADING_ABOUTUS
 } from '../constants';
 
 const initState = {
@@ -46,6 +48,10 @@ const initState = {
         events: {},
         categories: {
             data: [],
+            isLoading: false
+        },
+        aboutUs: {
+            data: {},
             isLoading: false
         }
     },
@@ -147,6 +153,26 @@ const homeReducer = (state= initState,{type,payload}) => {
                     ...state.site,
                     categories: {
                         ...state.site.categories,
+                        isLoading: payload
+                    }
+                }
+            }
+        case GET_DATA_ABOUTUS:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    aboutUs: {
+                        ...state.site.aboutUs,
+                        data: {...payload}
+                    }
+                }
+            }
+        case LOADING_ABOUTUS:
+            return {
+                ...state, site: {
+                    ...state.site,
+                    aboutUs: {
+                        ...state.site.aboutUs,
                         isLoading: payload
                     }
                 }

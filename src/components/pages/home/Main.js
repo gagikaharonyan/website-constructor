@@ -7,6 +7,7 @@ import Post from "../constructor/Post";
 import ContactUs from "../constructor/ContactUs";
 import Category from "../constructor/Category";
 import UnknownSection from "../constructor/UnknownSection";
+import AboutUs from "../constructor/AboutUs";
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -44,6 +45,8 @@ export default function Main(props) {
                                     return <ContactUs lang={lang}/>
                                 case "category":
                                     return <Category lang={lang}/>
+                                case "aboutUs":
+                                    return <AboutUs lang={lang}/>
                                 default: return <UnknownSection lang={lang}/>
                             }
                         })()}
