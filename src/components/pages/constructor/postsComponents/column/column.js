@@ -14,12 +14,12 @@ export default function (props, handelEditPost, handelDeletePost) {
             },
         },
         {
-            title: 'Title',
-            dataIndex: 'title',
+            title: 'Description',
+            dataIndex: 'description',
             key: Math.random(),
             sorter: (a, b) => {
-                const strA = a.title || '';
-                const strB = b.title || '';
+                const strA = a.description || '';
+                const strB = b.description || '';
                 return strA.localeCompare(strB)
             }
         },
@@ -48,8 +48,8 @@ export default function (props, handelEditPost, handelDeletePost) {
             key: 'actions',
             width: '200px',
             render: (text, record) => (
-                <span>
-                        <Button onClick={() => handelEditPost(record)} type="primary">
+                <span key={record.id}>
+                        <Button style={{marginRight:"10px"}} onClick={() => handelEditPost(record)} type="primary">
                             Edit
                         </Button>
 

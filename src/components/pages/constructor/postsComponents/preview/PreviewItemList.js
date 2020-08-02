@@ -210,7 +210,8 @@ function PreviewItemList(props) {
                         }
                         sendData.imgUrl = postImgUrl;
                         sendData.category = fields.category;
-                        sendData.title = fields.title;
+                        sendData.description = fields.description;
+                        sendData.title = fields.HEADING;
                         sendData.dateCreated = currentDate();
                         sendData.components = {
                             SLIDE: {type: 'SLIDE', imgUrls},
@@ -243,17 +244,16 @@ function PreviewItemList(props) {
                             PARAGRAPH: entry.PARAGRAPH,
                             QUOTE: entry.QUOTE,
                             VIDEO: entry.VIDEO,
-                            title: entry.title,
-                            category: entry.category
-
+                            category: entry.category,
+                            description: entry.description,
                         }}
                         validationSchema={
                             Yup.object({
                                 HEADING: Yup.string().required('Heading is required'),
-                                title: Yup.string().required('Title is required'),
                                 category: Yup.string().required('Category is required'),
                                 PARAGRAPH: Yup.string().required('Paragraph is required'),
                                 QUOTE: Yup.string().required('Quote is required'),
+                                description: Yup.string().required('Description is required'),
                                 VIDEO: Yup.string()
                                     .matches(
                                         /^((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
@@ -277,21 +277,6 @@ function PreviewItemList(props) {
                                     <Grid item xs={12}>
                                         <Grid container spacing={3}>
                                             <Grid item xs={6}>
-                                                <InputLabel id="demo-simple-select-label">Title</InputLabel>
-                                                <Field
-                                                    name="title"
-                                                    render={({field, form: {touched, errors}}) => (
-                                                        <div>
-                                                            <Input fullWidth {...field} type="text"
-                                                            />
-                                                            {touched[field.name] &&
-                                                            errors[field.name] && <div style={{color: "red"}}
-                                                                                       className="error">{errors[field.name]}</div>}
-                                                        </div>
-                                                    )}
-                                                />
-                                            </Grid>
-                                            <Grid item xs={6}>
                                                 <InputLabel id="demo-simple-select-label">Heading</InputLabel>
                                                 <Field
                                                     name="HEADING"
@@ -306,6 +291,22 @@ function PreviewItemList(props) {
                                                     )}
                                                 />
                                             </Grid>
+                                            <Grid item xs={6}>
+                                                <InputLabel id="demo-simple-select-label">Description</InputLabel>
+                                                <Field
+                                                    name="description"
+                                                    render={({field, form: {touched, errors}}) => (
+                                                        <div>
+                                                            <Input fullWidth {...field} type="text"
+                                                            />
+                                                            {touched[field.name] &&
+                                                            errors[field.name] && <div style={{color: "red"}}
+                                                                                       className="error">{errors[field.name]}</div>}
+                                                        </div>
+                                                    )}
+                                                />
+                                            </Grid>
+
 
                                         </Grid>
                                     </Grid>
@@ -398,7 +399,7 @@ function PreviewItemList(props) {
                                             </Upload>
                                         </Grid>
                                         <Grid className={classes.borderBlock} item xs={4}>
-                                            <InputLabel id="demo-simple-select-label">Images</InputLabel>
+                                            <InputLabel id="demo-simple-select-label">Cover Photo</InputLabel>
                                             <br/>
                                             <div className="clearfix">
                                                 <Upload

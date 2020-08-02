@@ -127,17 +127,16 @@ function CreateNewPost(props) {
                     PARAGRAPH: "",
                     QUOTE: "",
                     VIDEO: "",
-                    TITLE: "",
-                    CATEGORY: "Sport"
-
+                    CATEGORY: "Sport",
+                    shortDescription:""
                 }}
                 validationSchema={
                     Yup.object({
                         HEADING: Yup.string().required('Heading is required'),
-                        TITLE: Yup.string().required('Title is required'),
                         CATEGORY: Yup.string().required('Category is required'),
                         PARAGRAPH: Yup.string().required('Paragraph is required'),
                         QUOTE: Yup.string().required('Quote is required'),
+                        shortDescription: Yup.string().required('Short Description is required'),
                         VIDEO: Yup.string()
                             .matches(
                                 /^((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
@@ -161,9 +160,9 @@ function CreateNewPost(props) {
                             <Grid item xs={12}>
                                 <Grid container spacing={3}>
                                     <Grid item xs={6}>
-                                        <InputLabel id="demo-simple-select-label">Title</InputLabel>
+                                        <InputLabel id="demo-simple-select-label">Heading</InputLabel>
                                         <Field
-                                            name="TITLE"
+                                            name="HEADING"
                                             render={({field, form: {touched, errors}}) => (
                                                 <div>
                                                     <Input fullWidth {...field} type="text"
@@ -176,9 +175,9 @@ function CreateNewPost(props) {
                                         />
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <InputLabel id="demo-simple-select-label">Heading</InputLabel>
+                                        <InputLabel id="demo-simple-select-label">Short Description</InputLabel>
                                         <Field
-                                            name="HEADING"
+                                            name="shortDescription"
                                             render={({field, form: {touched, errors}}) => (
                                                 <div>
                                                     <Input fullWidth {...field} type="text"
@@ -269,7 +268,7 @@ function CreateNewPost(props) {
                                     </Upload>
                                 </Grid>
                                 <Grid className={classes.borderBlock} item xs={4}>
-                                    <InputLabel id="demo-simple-select-label">Images</InputLabel>
+                                    <InputLabel id="demo-simple-select-label">Cover Photo</InputLabel>
                                     <br/>
                                     <div className="clearfix">
                                         <Upload

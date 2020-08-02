@@ -78,7 +78,7 @@ function Post(props) {
 
     const handelSendAllChanges = (postData) => {
         let sendData = {id: uuidv1()};
-
+        console.log('postData',postData)
 
             setIsLoadingBtnSave(true)
         pictureUpload(postData.sliderImage).then((imgUrls) => {
@@ -86,8 +86,9 @@ function Post(props) {
                 pictureUpload(postData.postPhoto).then((photoUrl) => {
                     sendData.imgUrl = imgUrl.length > 0 ? imgUrl[0] : "";
                     sendData.category = postData.CATEGORY;
-                    sendData.title = postData.TITLE;
+                    sendData.title = postData.HEADING;
                     sendData.dateCreated = currentDate();
+                    sendData.description = postData.shortDescription;
                     sendData.components = {
                         SLIDE: {type: 'SLIDE', imgUrls},
                         PHOTO: {type: 'PHOTO', imgUrl: [...photoUrl]},
@@ -96,9 +97,10 @@ function Post(props) {
                         QUOTE: {type: 'QUOTE', text: postData.QUOTE},
                         VIDEO: {type: 'VIDEO', videoParam: youtubeParser(postData.VIDEO)}
                     };
-
+                    console.log('sendData',sendData)
                       Firebase.post(sendData.id).set(sendData, function (error) {
                         if (error) {
+                            console.log(error)
                             notification.warning({
                                 message: lang.notification,
                                 description: lang.error_post_added,
